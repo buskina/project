@@ -16,6 +16,8 @@ WHITE = (255, 255, 255)
 GREY=(192, 192,192)
 GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 time=0
+t1=110
+t2=300
 WIDTH = 800
 HEIGHT = 600
 GR=2
@@ -280,7 +282,7 @@ class Gun2(Gun):
         self.vy=1
         self.xo=WIDTH-10
         self.yo=10
-        self.t=17
+        self.t=43
         self.S=10
         self.u=10
     def move(self):
@@ -303,9 +305,10 @@ class Gun2(Gun):
                             (self.x+a,HEIGHT-b-self.y),
                             (self.x-a,HEIGHT-b-self.y)],0)
     def theory(self, obj):
-        """Считает расстояние до цели и начальную скорость"""
+        """Считает расстояние до цели S и начальную скорость u"""
         self.S=self.x-obj.x
         self.u=(self.S*GR/math.sin(2*self.bn))**0.5
+        
   
 class Target:
     
@@ -357,14 +360,14 @@ class Target:
 
     def hit(self, points=1):
         """Попадание шарика в цель."""
-        global score, text0,text1
+        global score, text0
         self.points += points
         score += points
         text0 = font.render("Score: "+str(score),True,BLACK)
         
         b.vx=-b.vx
         b.vy=-b.vy
-        self.w=0
+       
       
         
     def draw(self):
@@ -384,7 +387,7 @@ class Target2(Target):
        self.color = RED
        self.vx = randint(-10, 10)
        self.vy = randint(-10, 10)
-       self.live = 1
+       self.live = 2
        
        targets.append(self)
     def move(self):
@@ -408,7 +411,7 @@ class Target2(Target):
             self.r-=0.1
     def hit(self, points=5):
         """Попадание шарика в цель."""
-        global score,text0,text1
+        global score,text0
         self.points += points
         score+= points
         text0 = font.render("Score: "+str(score),True,BLACK)
@@ -421,11 +424,9 @@ class Enemy():
         """
         self.screen = screen
         self.points = 2
-        self.live = 1
-        
-        self.xo = 40
-        self.yo = 40
-        self.ro=30
+        self.live = 0
+        self.xo = 400
+        self.yo = 400
         self.color = BLACK
         self.rd=0
         self.x = self.xo
@@ -434,49 +435,50 @@ class Enemy():
         self.vx = 1
         self.r = randint(20, 50)
         self.w=0
-    def par(self,obj):
+    '''def par(self,obj):
         'Связывает координаты танка и снаряда, задает ему скорость'
-        self.xo = obj.xo
-        self.yo = obj.yo
+        self.xo = obj.x
+        self.yo = obj.y
         self.vx=math.cos(obj.bn)*obj.u
         self.vy=math.sin(obj.bn)*obj.u
-    def new_ball(self):
+        print(obj.x)
+        print(obj.y)'''
+    def new_ball(self,obj):
        'Инициализация нового снаряда.'
+       self.xo = obj.x
+       self.yo = obj.y
        self.x = self.xo
        self.y = self.yo
        self.r = randint(20, 50)
        self.live = 1
        self.color = BLACK
+       self.vx=math.cos(obj.bn)*obj.u
+       self.vy=math.sin(obj.bn)*obj.u
        
     def draw(self):
         pygame.draw.circle(
             self.screen,
             self.color,
-            (self.x, self.y),
+            (self.x, HEIGHT-self.y),
             self.r)
     
     def move(self):
-        self.x += self.vx
+        self.x -= self.vx
         self.y += self.vy-GR/2
-    def hit0(self,obj,screen, points=5):
+        self.vy-=GR
+    def hit0(self,obj, points=5):
         """Попадание снаряда в танк."""
-        global score
-        if abs(self.x-obj.x)<self.r and abs(HEIGHT-self.y-obj.y)<self.r:
-            score+= -points
+        global score,text0
+        if ((self.x-obj.x)**2+(self.y-obj.y)**2) <= (self.r)**2:
+            score-= points
+            print(score)
             text0 = font.render("Score: "+str(score),True,BLACK)
-            self.text2 = font.render("Вы повреждены ",True,BLACK)
-            self.new_ball()
-            self.rd=0
-            self.w=20
-        else:
-           self.w-=1 
+            self.x=WIDTH+10
+            self.y=0
+            self.color=WHITE
+            self.Vx=0
+            self.Vy=0
             
-            
-    def fire(self):
-        self.rd+=1
-        if int(self.rd) >200:
-            self.new_ball()
-            self.rd=0
        
         
  
@@ -520,17 +522,17 @@ while not finished:
         t.draw()
     for b in balls:
         b.draw()
-    if time>110:
+    if time>t1:
         tank3.draw()
-        if time <300:
+        if time <t2:
             tank3.move()
         if time % tank3.t==0:
             tank3.theory(tank1)
-            enemy1.par(tank3)
-        if time >300:
-            enemy1.move()
+            enemy1.new_ball(tank3)
+        if time >t2 and enemy1.live==1:
             enemy1.draw()
-            enemy1.hit0(tank1,screen)
+            enemy1.hit0(tank1)
+            enemy1.move()  
                  
     
     pygame.display.update()
@@ -563,18 +565,20 @@ while not finished:
         elif event.type == pygame.MOUSEMOTION:
             for g in tanks: 
                 g.targetting(event)
-            
+          
     for b in balls:
         b.move()
         for t in targets:
-            if b.hittest(t) and t.live==2:
-                t.live=1
-                if b in balls:
-                    balls.remove(b) 
             if b.hittest(t) and t.live==1:
                     t.hit()
                     t.new_target()
                     t.draw()
+                    if b in balls:
+                        balls.remove(b)
+            if b.hittest(t) and t.live==2:
+                t.live=1
+                if b in balls:
+                        balls.remove(b)
     for g in tanks: 
         g.power_up()
     if tank2 in tanks:
