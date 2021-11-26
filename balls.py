@@ -5,15 +5,16 @@ pygame.init()
 FPS = 30
 
 RED = (255, 0, 0)
-BLUE = (0, 0, 255)
+PURPLE = ((240,0,255))
+BLUE = ((0,255,255))
 YELLOW = (230, 230, 0)
-GREEN = (0, 255, 0)
+GREEN = ((0,255,0))
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GREY=(192, 192,192)
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+RUST = ((210,150,75))
+GAME_COLORS = [RED, BLUE, YELLOW, GREEN,RUST, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
@@ -31,23 +32,34 @@ class Ball:
         """
         self.screen = screen
         self.x = 10
-        self.y = HEIGHT-10
+        self.y = 10
         self.r = 10
         self.vx = 0
         self.vy = 0
-        self.color = choice(GAME_COLORS)
+        self.color = PURPLE
         self.live = 30
         
     
 
-    def move(self):
+    def move(self,event):
         """Переместить снаряд по прошествии единицы времени.
 
         Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
         self.x и self.y с учетом скоростей self.vx и self.vy.
         """
         
-        pass
+        if event.key==pygame.K_LEFT:
+                self.vx=-10
+                self.x += self.vx
+        if event.key==pygame.K_RIGHT:
+                self.vx=10
+                self.x += self.vx
+        if event.key==pygame.K_UP:
+                self.vy=10
+                self.y += self.vy
+        if event.key==pygame.K_DOWN:
+                self.vy=-10
+                self.y += self.vy
         
 
     def draw(self):
@@ -55,9 +67,8 @@ class Ball:
         pygame.draw.circle(
             self.screen,
             self.color,
-            (self.x, self.y),
-            self.r
-        )
+            (self.x, HEIGHT-self.y),
+            self.r)
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -68,22 +79,9 @@ class Ball:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
         if ((self.x-obj.x)**2+(self.y-obj.y)**2)<=(self.r+obj.r)**2:
-            return True
-        else:
-            return False
-    def hittest0(self, obj):
-        
-        """Функция проверяет сталкивалкивается ли данный обьект с целью(финишем), описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае пападания мяча в цель. В противном случае возвращает False.
-        """
-        if ((self.x-obj.x)**2+(HEIGHT-self.y-obj.y)**2)<=(self.r)**2:
-            return True
-        else:
-            return False
+            self.r=(obj.r+self.r)/2
+            obj.new_target()
+       
 
 class Target:
     
@@ -108,9 +106,9 @@ class Target:
        self.x = randint(600, 780)
        self.y = randint(300, 550)
        self.r = randint(5, 50)
-       self.color = BLUE
-       self.vx = randint(-10, 10)
-       self.vy = randint(-10, 10)
+       self.color = choice(GAME_COLORS)
+       self.vx = randint(-3, 3)
+       self.vy = randint(-3, 3)
        self.live = 2
        targets.append(self)
     def move(self):
@@ -141,7 +139,7 @@ class Target:
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-balls = []
+
 targets = []
 
 clock = pygame.time.Clock()
@@ -151,7 +149,7 @@ target2 = Target()
 target3 = Target()
 target4 = Target()
 targets = [target1, target2,target3,target4]
-
+me=Ball(screen)
 
 text0 = font.render("Score: 0",True,BLACK)
 
@@ -165,9 +163,7 @@ while not finished:
     for t in targets:
         t.move()
         t.draw()
-    for b in balls:
-        b.move()
-        b.draw()
+    me.draw()
    
     pygame.display.update()
 
@@ -178,6 +174,10 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
+            me.move(event)
+    for t in targets:
+        me.hittest(t)
+            
         
           
     
