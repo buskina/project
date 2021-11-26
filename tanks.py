@@ -170,6 +170,7 @@ class Gun:
         self.vy=1
         self.xo=10
         self.yo=10
+        self.live=100
     '''def move(self,event):
         if event.key==pygame.K_LEFT:
                 self.vx=-10
@@ -258,6 +259,14 @@ class Gun:
                             (self.x+a,HEIGHT-self.y),
                             (self.x+a,HEIGHT-b-self.y),
                             (self.x-a,HEIGHT-b-self.y)],0)
+        polygon(screen,GREEN,[(5,20 ),
+                            (5+self.live,20),
+                            (5+self.live,25),
+                             (5,25 )],0)
+        polygon(screen,BLACK,[(5,20 ),
+                            (5+100,20),
+                            (5+100,25),
+                             (5,25 )],1)
 
     def power_up(self):
         if self.f2_on:
@@ -326,8 +335,8 @@ class Gun2(Gun):
                             (WIDTH-5-self.live,25),
                              (WIDTH-5,25 )],0)
         polygon(screen,BLACK,[(WIDTH-5,20 ),
-                            (WIDTH-5-self.live,20),
-                            (WIDTH-5-self.live,25),
+                            (WIDTH-5-100,20),
+                            (WIDTH-5-100,25),
                              (WIDTH-5,25 )],1)
     def theory(self, obj):
         """Считает расстояние до цели S и начальную скорость u"""
@@ -491,7 +500,7 @@ class Enemy():
         self.x -= self.vx
         self.y += self.vy-GR/2
         self.vy-=GR
-    def hit0(self,obj, points=5):
+    def hit0(self,obj, points=1):
         """Попадание снаряда в танк."""
         global score,text0
         if ((self.x-obj.x)**2+(self.y-obj.y)**2) <= (self.r)**2:
@@ -502,6 +511,7 @@ class Enemy():
             self.color=WHITE
             self.Vx=0
             self.Vy=0
+            obj.live-=10
             
        
         
