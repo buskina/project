@@ -87,6 +87,20 @@ class Ball:
             return True
         else:
             return False
+    def hittest0(self, obj):
+        
+        """Функция проверяет сталкивалкивается ли данный обьект с целью(танком), описываемой в обьекте obj.
+
+        Args:
+            obj: Обьект, с которым проверяется столкновение.
+        Returns:
+            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+        """
+        if ((self.x-obj.x)**2+(HEIGHT-self.y-obj.y)**2)<=(self.r)**2:
+            obj.live-=10
+            return True
+        else:
+            return False
 class Bul1(Ball):
    pass
 class Bul2(Ball):
@@ -285,9 +299,12 @@ class Gun2(Gun):
         self.t=43
         self.S=10
         self.u=10
+        self.live=100
     def move(self):
+        """Перемещение танка"""
         self.x+=self.vx
     def draw(self):
+        """Рисует танк и его жизни"""
         L=50+self.k
         H=5
         a=20
@@ -304,6 +321,14 @@ class Gun2(Gun):
                             (self.x+a,HEIGHT-self.y),
                             (self.x+a,HEIGHT-b-self.y),
                             (self.x-a,HEIGHT-b-self.y)],0)
+        polygon(screen,GREEN,[(WIDTH-5,20 ),
+                            (WIDTH-5-self.live,20),
+                            (WIDTH-5-self.live,25),
+                             (WIDTH-5,25 )],0)
+        polygon(screen,BLACK,[(WIDTH-5,20 ),
+                            (WIDTH-5-self.live,20),
+                            (WIDTH-5-self.live,25),
+                             (WIDTH-5,25 )],1)
     def theory(self, obj):
         """Считает расстояние до цели S и начальную скорость u"""
         self.S=self.x-obj.x
@@ -471,7 +496,6 @@ class Enemy():
         global score,text0
         if ((self.x-obj.x)**2+(self.y-obj.y)**2) <= (self.r)**2:
             score-= points
-            print(score)
             text0 = font.render("Score: "+str(score),True,BLACK)
             self.x=WIDTH+10
             self.y=0
@@ -568,6 +592,7 @@ while not finished:
           
     for b in balls:
         b.move()
+        b.hittest0(tank3)
         for t in targets:
             if b.hittest(t) and t.live==1:
                     t.hit()
