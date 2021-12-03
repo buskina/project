@@ -64,14 +64,8 @@ class Fire(pygame.sprite.Sprite):
         Если убрать мышку, очки обнуляются"""
         if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
             self.points+=1
-            print(self.points)
         else:    
            self.points=0 
-        
-    def fin(self):
-        if self.points==10:
-            finished = True   
-           
     
 class Targ(pygame.sprite.Sprite):
     def __init__(self):
