@@ -34,9 +34,9 @@ class Target:
         """
         self.screen = screen
         self.points = 0
-        self.live = 2
+        self.live = 1
         self.new_target()
-        self.point=5
+        self.point=1
         
    
     def new_target(self):
@@ -51,7 +51,6 @@ class Target:
        targets.append(self)
     def move(self):
         """Переместить цель по прошествии единицы времени.
-
         Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
         self.x и self.y с учетом скоростей self.vx и self.vy
         и стен по краям окна (размер окна 800х600).
@@ -68,26 +67,27 @@ class Target:
         self.x += self.vx
         self.y += self.vy
     def draw(self):
+        'Рисует цель'
         pygame.draw.circle(
             self.screen,
             self.color,
             (self.x, self.y),
             self.r)
     def hittest(self, x1,y1):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
+        """Функция проверяет нажали ли мы на цель.
         Args:
-            obj: Обьект, с которым проверяется столкновение.
+           x1, y1 координаты мыши
         Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+            Удаляет шарик, создает новый, добавляет очки.
         """
-        global score
+        global score, text0
         if event.type == pygame.MOUSEBUTTONDOWN:
             x1,y1=pygame.mouse.get_pos()
         if ((self.x-x1)**2+(self.y-y1)**2)<=(self.r)**2:
             targets.remove(self)
             self.new_target()
-            score+=self.point
+            score+=self.point*self.r
+            text0 = font.render("Score: "+str(score),True,BLACK)
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
