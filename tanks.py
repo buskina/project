@@ -17,7 +17,7 @@ WHITE = (255, 255, 255)
 GREY=(192, 192,192)
 GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 time=0
-t1=110
+t1=150
 t2=300
 WIDTH = 800
 HEIGHT = 600
@@ -26,7 +26,7 @@ score=0
 font = pygame.font.Font(None, 25)
 class Bul1:
     def __init__(self, screen: pygame.Surface,x=10, y=HEIGHT-10):
-        """ Конструктор класса Ball
+        """ Конструктор класса Bul1
 
         Args:
         x - начальное положение мяча по горизонтали
@@ -86,10 +86,7 @@ class Bul1:
         """
        
         if ((self.x-obj.rect.x)**2+(self.y-obj.rect.y)**2)<=(self.r+10)**2:
-            print(self.x)
-            print(self.y)
-            print(obj.rect.x)
-            print(obj.rect.y)
+            
             
             return True
         else:
@@ -174,23 +171,22 @@ class Gun1:
         self.x=10
         self.vx=1
         self.y=10
-        self.vy=1
+        
         self.xo=10
         self.yo=10
         self.live=100
+    def check(self):
+        if tank3.x-self.x<=40:
+           self.x-=40
     def move(self,event):
+        self.check()
         if event.key==pygame.K_LEFT:
                 self.vx=-10
                 self.x += self.vx
         if event.key==pygame.K_RIGHT:
                 self.vx=10
                 self.x += self.vx
-        if event.key==pygame.K_UP:
-                self.vy=10
-                self.y += self.vy
-        if event.key==pygame.K_DOWN:
-                self.vy=-10
-                self.y += self.vy
+        
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -306,17 +302,21 @@ class Gun2(Gun1):
         self.attempt=0
         self.num=1
         self.x=tank2.x
-        self.vx=2
+        self.vx=5
         self.y=tank2.y
         self.vy=1
-        self.xo=WIDTH-10
+        self.xo=20
         self.yo=10
         self.t=43
         self.S=10
         self.u=10
         self.live=100
+   
+        
+            
     def move(self):
         """Перемещение танка"""
+        
         self.x+=self.vx
     def draw(self):
         """Рисует танк и его жизни"""
@@ -350,113 +350,9 @@ class Gun2(Gun1):
         self.u=(self.S*GR/math.sin(2*self.bn))**0.5
         
   
-class Target1:
-    
-    def __init__(self):
-        """ Конструктор класса Target
-
-        Args:
-        points - начальные очки
-        live - начальное число жизней
-        """
-        self.screen = screen
-        self.points = 0
-        self.live = 2
-        self.new_target()
-        self.w=20
-        
- 
 
 
-    def new_target(self):
-       'Инициализация новой цели.'
-       self.x = randint(600, 780)
-       self.y = randint(300, 550)
-       self.r = randint(5, 50)
-       self.color = BLUE
-       self.vx = randint(-10, 10)
-       self.vy = randint(-10, 10)
-       self.live = 2
-       self.w=20
-       targets.append(self)
-    def move(self):
-        """Переместить цель по прошествии единицы времени.
 
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy
-        и стен по краям окна (размер окна 800х600).
-        """
-        pass
-        if self.vx >0 and  self.x+self.r>=WIDTH:
-            self.vx=-self.vx
-        if self.vx <0 and  self.x-self.r<=0:
-            self.vx=-self.vx
-        if self.vy >0 and  self.y+self.r>=HEIGHT:
-            self.vy=-self.vy
-        if self.vy <0 and  self.y-self.r<=0:
-            self.vy=-self.vy
-        self.x += self.vx
-        self.y += self.vy
-
-    def hit(self, points=1):
-        """Попадание шарика в цель."""
-        global score, text0
-        self.points += points
-        score += points
-        text0 = font.render("Score: "+str(score),True,BLACK)
-        
-        b.vx=-b.vx
-        b.vy=-b.vy
-       
-      
-        
-    def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r)
-
-class Target2(Target1):
-    def new_target(self):
-       'Инициализация новой цели.'
-       self.x = randint(600, 780)
-       self.y = randint(300, 550)
-       self.r = randint(50, 60)
-       self.color = RED
-       self.vx = randint(-10, 10)
-       self.vy = randint(-10, 10)
-       self.live = 2
-       
-       targets.append(self)
-    def move(self):
-        """Переместить цель по прошествии единицы времени.
-
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy
-        и стен по краям окна (размер окна 800х600).
-        """
-        if self.vx >0 and  self.x+self.r>=WIDTH:
-            self.vx=-self.vx
-        if self.vx <0 and  self.x-self.r<=0:
-            self.vx=-self.vx
-        if self.vy >0 and  self.y+self.r>=HEIGHT:
-            self.vy=-self.vy
-        if self.vy <0 and  self.y-self.r<=0:
-            self.vy=-self.vy
-        self.x += self.vx
-        self.y += self.vy
-        if self.r>30:
-            self.r-=0.1
-    def hit(self, points=5):
-        """Попадание шарика в цель."""
-        global score,text0
-        self.points += points
-        score+= points
-        text0 = font.render("Score: "+str(score),True,BLACK)
-        
-        
-        self.w=0
 class Enemy(): 
     def __init__(self):
         """ Конструктор класса Enemy
@@ -474,14 +370,7 @@ class Enemy():
         self.vx = 1
         self.r = randint(20, 50)
         self.w=0
-    '''def par(self,obj):
-        'Связывает координаты танка и снаряда, задает ему скорость'
-        self.xo = obj.x
-        self.yo = obj.y
-        self.vx=math.cos(obj.bn)*obj.u
-        self.vy=math.sin(obj.bn)*obj.u
-        print(obj.x)
-        print(obj.y)'''
+    
     def new_ball(self,obj):
        'Инициализация нового снаряда.'
        self.xo = obj.x
@@ -542,7 +431,7 @@ for i in range(4):
 tank1=Gun1()
 tank2=Gun1()
 tank3=Gun2()
-tank2.x=80
+tank2.x=90
 tanks=[tank1,tank2]
 enemy1=Enemy()
 text0 = font.render("Score: 0",True,BLACK)
