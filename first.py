@@ -43,8 +43,8 @@ class Cell:
         """
         Отрисовывает ячейку
         """
-        if self.type:
-            if self.type-1:
+        if self.type!=0:
+            if self.type==2:
                 pygame.draw.rect(self.screen, 
                 GREEN, (self.x*CELLSIZE, self.y*CELLSIZE, 
                 CELLSIZE, CELLSIZE))
@@ -61,31 +61,38 @@ class Cell:
         """
         Проверяем, попал ли пользователь в ячейку
         """
-        if event:
-            if (event.pos[0]<=(self.x+1)*CELLSIZE & event.pos[0]>=(self.x)*CELLSIZE &
-             event.pos[1]<=(self.y+1)*CELLSIZE & event.pos[1]>=self.y*CELLSIZE & self.type!=0):
-                self.time=0
-                self.type=0
-                return True
-            else: 
-                return False
-        else:
+        if (event.pos[0]<=(self.x+1)*CELLSIZE and event.pos[0]>=(self.x)*CELLSIZE and
+            event.pos[1]<=(self.y+1)*CELLSIZE and event.pos[1]>=self.y*CELLSIZE and self.type!=0):
+            self.time=0
+            self.type=0
+            self.chosen=0
+            return True
+        else: 
             return False
-
-    def move(self):
+      
+    def move(self,field):
         """
         Функция движения ячейки. Если она открыта, время уменьшается на 1. Если она выбрана под 
         заполнение, меняем тип и время открытия на случайные. Если ячейка закрыта, ничего не происходит.
         """
-        if self.time>0:
-            self.time-=1
-        if self.time<=0:
-            self.time=0
-            self.type=0
         if self.chosen:
             self.type = randint(1,2)
             self.time = randint(30,60)
             self.chosen = 0
+
+        if self.time>0:
+            self.time-=1
+        elif self.type != 0:
+            self.time=0
+            self.type=0
+            chosen = 0
+            while not chosen:
+                x = randint(0,5)
+                y = randint(0,5)
+                if field[x][y].type == 0:
+                    field[x][y].chosen = True
+                    chosen = True
+        
 
 def fielding(number_of_cells):
     field=[]
@@ -105,35 +112,55 @@ def planting(field, number_of_cells):
         for j in range(number_of_cells):
             field[i][j].x = i
             field[i][j].y = j
-            field[i][j].move()
+            field[i][j].move(field)
             field[i][j].draw()
 
 def action(field, number_of_cells):
     for i in range(number_of_cells):
         for j in range(number_of_cells):
+            field[i][j].move(field)
+
+def draw(field, number_of_cells):
+  for i in range(number_of_cells):
+        for j in range(number_of_cells):
+            field[i][j].draw()
+
+
+def testing(field, number_of_cells, event):
+    for i in range(number_of_cells):
+        for j in range(number_of_cells):
             if field[i][j].clicktest(event):
-                chosen = 0
+                field[i][j].type=0
+                field[i][j].time=0
+                field[i][j].chosen=0
+                print('success')
+                chosen = False
                 while not chosen:
                     x = randint(0,5)
                     y = randint(0,5)
                     if field[x][y].type==0:
-                        field[x][y].chosen=1
-                        chosen=1
-            field[i][j].move()
-            field[i][j].draw()
+                        field[x][y].chosen = True
+                        chosen = True
 
 field=fielding(CELLNUM)
+
+
 planting(field, CELLNUM)
 
 not_finished = True
 while not_finished:
     clock.tick(FPS)
+    action(field, CELLNUM)
+    draw(field, CELLNUM)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             not_finished = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             print('Click!')
+            testing(field, CELLNUM, event)
             action(field, CELLNUM)
             pygame.display.update()
+
+    
     pygame.display.update()
 pygame.quit()
