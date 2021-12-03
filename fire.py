@@ -24,7 +24,29 @@ HEIGHT = 600
 score=0
 font = pygame.font.Font(None, 25)
 
+class Fire(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=targ1_img
+        self.image = pygame.transform.scale(fire_img, (100, 100))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,20)
+        self.rect.y = randint(HEIGHT-40,HEIGHT -10)
+        self.speedy = randint(1, 8)
+        self.speedx = randint(1, 8)
+        self.points=1
+        self.r=50
 
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y -= self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = randint(0,WIDTH - self.rect.width)
+            self.rect.y = randint(-100, -40)
+            self.speedy = randint(1, 8)      
+    
 class Targ(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -63,9 +85,11 @@ img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'f3.png')).convert()
 background_rect = background.get_rect()
 targ1_img = pygame.image.load(path.join(img_dir, "light.png")).convert()
+fire_img = pygame.image.load(path.join(img_dir, "fire.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
-
+fire=Fire()
+all_sprites.add(fire)
 for i in range(4):
     m = Targ()
     all_sprites.add(m)
