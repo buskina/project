@@ -1,6 +1,7 @@
 from random import choice, randint
 import pygame
 from pygame.draw import *
+from os import path
 pygame.init()
 pygame.display.set_caption("Follow to the fire!")
 FPS = 30
@@ -23,99 +24,64 @@ HEIGHT = 600
 score=0
 font = pygame.font.Font(None, 25)
 
-class Target:
-    
+
+class Targ(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Target
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=targ1_img
+        self.image = pygame.transform.scale(targ1_img, (70, 70))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,WIDTH - self.rect.width)
+        self.rect.y = randint(-100, -40)
+        self.speedy = randint(1, 8)
+        self.speedx = randint(1, 8)
+        self.points=1
+        self.r=70
 
-        Args:
-        points - начальные очки
-        live - начальное число жизней
-        """
-        self.screen = screen
-        self.points = 0
-        self.live = 1
-        self.new_target()
-        self.point=1
-        
-   
-    def new_target(self):
-       'Инициализация новой цели.'
-       self.x = randint(600, 780)
-       self.y = randint(300, 550)
-       self.r = randint(5, 50)
-       self.color = choice(GAME_COLORS)
-       self.vx = randint(-3, 3)
-       self.vy = randint(-3, 3)
-       self.live = 1
-       targets.append(self)
-    def move(self):
-        """Переместить цель по прошествии единицы времени.
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy
-        и стен по краям окна (размер окна 800х600).
-        """
-        pass
-        if self.vx >0 and  self.x+self.r>=WIDTH:
-            self.vx=-self.vx
-        if self.vx <0 and  self.x-self.r<=0:
-            self.vx=-self.vx
-        if self.vy >0 and  self.y+self.r>=HEIGHT:
-            self.vy=-self.vy
-        if self.vy <0 and  self.y-self.r<=0:
-            self.vy=-self.vy
-        self.x += self.vx
-        self.y += self.vy
-    def draw(self):
-        'Рисует цель'
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r)
-    def hittest(self, x1,y1):
-        """Функция проверяет нажали ли мы на цель.
-        Args:
-           x1, y1 координаты мыши
-        Returns:
-            Удаляет шарик, создает новый, добавляет очки.
-        """
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = randint(0,WIDTH - self.rect.width)
+            self.rect.y = randint(-100, -40)
+            self.speedy = randint(1, 8)      
+    def hit(self,x1,y1):
+        """Попадание  в цель."""
         global score, text0
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x1,y1=pygame.mouse.get_pos()
-        if ((self.x-x1)**2+(self.y-y1)**2)<=(self.r)**2:
-            targets.remove(self)
-            self.new_target()
-            score+=self.point*self.r
-            text0 = font.render("Score: "+str(score),True,BLACK)
-
+        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
+            score += self.points
+            text0 = font.render("Score: "+str(score),True,WHITE)
+            self.kill()
+            m = Targ()
+            all_sprites.add(m)
+            targets.add(m)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+img_dir = path.join(path.dirname(__file__), 'img')
+background = pygame.image.load(path.join(img_dir, 'f3.png')).convert()
+background_rect = background.get_rect()
+targ1_img = pygame.image.load(path.join(img_dir, "light.png")).convert()
+all_sprites = pygame.sprite.Group()
+targets = pygame.sprite.Group()
 
-
-targets = []
-
+for i in range(4):
+    m = Targ()
+    all_sprites.add(m)
+    targets.add(m)
 clock = pygame.time.Clock()
-
-target1 = Target()
-target2 = Target()
-target3 = Target()
-target4 = Target()
-targets = [target1, target2,target3,target4]
-
-
-text0 = font.render("Score: 0",True,BLACK)
-
+text0 = font.render("Score: 0",True,WHITE)
 
 finished = False
 
 while not finished:
-    screen.fill(WHITE)
-    polygon(screen,WHITE,[(0,0),(200,0),(200,200),(0,200)],0)
+    screen.fill(BLACK)
+    screen.blit(background, background_rect)
     screen.blit(text0, [40,100])
-    for t in targets:
-        t.move()
-        t.draw()
+    all_sprites.draw(screen)
+    screen.blit(text0, [40,100])
+    
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
@@ -127,8 +93,8 @@ while not finished:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x1,y1=pygame.mouse.get_pos()
             for t in targets:
-                t.hittest(x1,y1)
-          
+                t.hit(x1,y1)
+    all_sprites.update()     
         
           
     
