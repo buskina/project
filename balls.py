@@ -142,11 +142,7 @@ class Target:
            
 
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
-background_rect = background.get_rect()
-exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
+
 class Exit(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -160,11 +156,16 @@ class Exit(pygame.sprite.Sprite):
         self.speedx = 0
         
     
-
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+img_dir = path.join(path.dirname(__file__), 'img')
+background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
+background_rect = background.get_rect()
+exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
 all_sprites = pygame.sprite.Group()
+targets = []
 exit1 = Exit()
 all_sprites.add(exit1)
-targets = []
+
 
 clock = pygame.time.Clock()
 
