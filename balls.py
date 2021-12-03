@@ -72,18 +72,43 @@ class Ball:
             (self.x, HEIGHT-self.y),
             self.r)
 
-    
-       
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50, 40))
+        self.image=pl1_img
+        self.image = pygame.transform.scale(pl1_img, (70, 70))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
+        self.speedy = 0
 
-
-           
-
+    def update(self):
+        self.speedx = 0
+        self.speedy = 0
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -8
+        if keystate[pygame.K_RIGHT]:
+            self.speedx = 8
+        if keystate[pygame.K_UP]:
+            self.speedy = -8
+        if keystate[pygame.K_DOWN]:
+            self.speedy = 8
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
 
 class Planets(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.k=randint(1,6)
+        self.k=randint(2,6)
         pl0_img=pygame.image.load(path.join(img_dir, "pl"+str(self.k)+".png")).convert()
         self.image=pl0_img
         self.image = pygame.transform.scale(pl0_img, (70, 70))
@@ -143,14 +168,13 @@ all_sprites = pygame.sprite.Group()
 planets = pygame.sprite.Group()
 exit1 = Exit()
 all_sprites.add(exit1)
+player = Player()
+all_sprites.add(player)
 clock = pygame.time.Clock()
 for i in range(4):
     m = Planets()
     all_sprites.add(m)
     planets.add(m)
-
-me=Ball(screen)
-
 text0 = font.render("Score: 0",True,WHITE)
 
 
@@ -161,10 +185,6 @@ while not finished:
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
     screen.blit(text0, [40,100])
-    me.draw()
-       
-    all_sprites.draw(screen)  
-   
     pygame.display.update()
 
     clock.tick(FPS)
@@ -174,8 +194,6 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
-            me.move(event)
-            me.draw()
     all_sprites.update()  
           
     
