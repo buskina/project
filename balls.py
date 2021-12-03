@@ -2,7 +2,10 @@ from random import choice, randint
 import pygame
 from pygame.draw import *
 pygame.init()
+pygame.display.set_caption("Balls!")
 FPS = 30
+from os import path
+
 
 RED = (255, 0, 0)
 PURPLE = ((240,0,255))
@@ -42,7 +45,7 @@ class Ball:
     
 
     def move(self,event):
-        """Переместить снаряд по прошествии единицы времени.
+        """Переместить мяч по прошествии единицы времени.
 
         Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
         self.x и self.y с учетом скоростей self.vx и self.vy.
@@ -60,7 +63,6 @@ class Ball:
         if event.key==pygame.K_DOWN:
                 self.vy=-10
                 self.y += self.vy
-        
 
     def draw(self):
         'Фнкция рисует мяч'
@@ -70,17 +72,7 @@ class Ball:
             (self.x, HEIGHT-self.y),
             self.r)
 
-    def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
-        """
-        if ((self.x-obj.x)**2+(self.y-obj.y)**2)<=(self.r+obj.r)**2:
-            self.r=(obj.r+self.r)/2
-            obj.new_target()
+    
        
 
 class Target:
@@ -93,14 +85,11 @@ class Target:
         live - начальное число жизней
         """
         self.screen = screen
-        self.points = 0
+        self.points = 5
         self.live = 2
         self.new_target()
- 
         
- 
-
-
+   
     def new_target(self):
        'Инициализация новой цели.'
        self.x = randint(600, 780)
@@ -135,11 +124,46 @@ class Target:
             self.color,
             (self.x, self.y),
             self.r)
+    def hittest(self, obj):
+        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+
+        Args:
+            obj: Обьект, с которым проверяется столкновение.
+        Returns:
+            Возвращает счет, удаляет шарик,создает новый, меняет радиус игрока
+        """
+        global score, text0
+        if ((self.x-obj.x)**2+(self.y-HEIGHT+obj.y)**2)<=(self.r+obj.r)**2:
+            obj.r=(obj.r+self.r)/2
+            targets.remove(self)
+            self.new_target()
+            score+=self.points
+            text0 = font.render("Score: "+str(score),True,WHITE)
+           
 
 
-pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+img_dir = path.join(path.dirname(__file__), 'img')
+background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
+background_rect = background.get_rect()
+exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
+class Exit(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50, 40))
+        self.image=exit_img
+        self.image = pygame.transform.scale(exit_img, (60, 60))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH*2 / 3
+        self.rect.bottom = HEIGHT/6
+        self.speedx = 0
+        
+    
 
+all_sprites = pygame.sprite.Group()
+exit1 = Exit()
+all_sprites.add(exit1)
 targets = []
 
 clock = pygame.time.Clock()
@@ -151,19 +175,22 @@ target4 = Target()
 targets = [target1, target2,target3,target4]
 me=Ball(screen)
 
-text0 = font.render("Score: 0",True,BLACK)
+text0 = font.render("Score: 0",True,WHITE)
 
 
 finished = False
 
 while not finished:
-    screen.fill(WHITE)
-    polygon(screen,WHITE,[(0,0),(200,0),(200,200),(0,200)],0)
+    screen.fill(BLACK)
+    screen.blit(background, background_rect)
+    all_sprites.draw(screen)
     screen.blit(text0, [40,100])
     for t in targets:
         t.move()
         t.draw()
     me.draw()
+       
+    all_sprites.draw(screen)  
    
     pygame.display.update()
 
@@ -175,10 +202,10 @@ while not finished:
             if event.key==pygame.K_ESCAPE:
                 finished = True
             me.move(event)
+            me.draw()
     for t in targets:
-        me.hittest(t)
-            
-        
+        t.hittest(me)
+      
           
     
     
