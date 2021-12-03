@@ -32,20 +32,32 @@ class Fire(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(fire_img, (100, 100))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.x = randint(0,20)
-        self.rect.y = randint(HEIGHT-40,HEIGHT -10)
-        self.speedy = randint(1, 8)
-        self.speedx = randint(1, 8)
-        self.points=1
-        self.r=50
-
+        self.rect.x = 20
+        self.rect.y = HEIGHT-150
+        self.speedy = 5
+        self.speedx = 5
+        self.points=0
+        self.r=100
+     
+    
     def update(self):
         self.rect.x += self.speedx
         self.rect.y -= self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
-            self.rect.x = randint(0,WIDTH - self.rect.width)
-            self.rect.y = randint(-100, -40)
-            self.speedy = randint(1, 8)      
+        if self.rect.top > HEIGHT-100  or self.rect.top < 0:
+            self.speedy=-self.speedy
+        if self.rect.left < 0 or self.rect.right > WIDTH :
+            self.speedx=-self.speedx
+       
+    def hit(self,x1,y1):
+        """Удержание  вцели."""
+        global score, text0
+        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
+            self.points+=1
+            print(self.points)
+        else:    
+           self.points=0  
+        
+           
     
 class Targ(pygame.sprite.Sprite):
     def __init__(self):
@@ -118,8 +130,12 @@ while not finished:
             x1,y1=pygame.mouse.get_pos()
             for t in targets:
                 t.hit(x1,y1)
+        elif event.type == pygame.MOUSEMOTION:
+            x1,y1=pygame.mouse.get_pos()
+            fire.hit(x1,y1)
     all_sprites.update()     
-        
+    if fire.points==50:
+        finished = True
           
     
     
