@@ -2,6 +2,7 @@ import math
 from random import choice, randint
 import pygame
 from pygame.draw import *
+
 pygame.init()
 FPS = 30
 
@@ -144,7 +145,7 @@ class Bul2(Ball):
             balls.remove(self)
             
 
-class Gun:
+class Gun1:
 
     def __init__(self):
         """ Конструктор класса Gun
@@ -171,7 +172,7 @@ class Gun:
         self.xo=10
         self.yo=10
         self.live=100
-    '''def move(self,event):
+    def move(self,event):
         if event.key==pygame.K_LEFT:
                 self.vx=-10
                 self.x += self.vx
@@ -183,7 +184,7 @@ class Gun:
                 self.y += self.vy
         if event.key==pygame.K_DOWN:
                 self.vy=-10
-                self.y += self.vy'''
+                self.y += self.vy
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -278,11 +279,10 @@ class Gun:
         else:
             self.color = GREY
            
-class Gun1(Gun):
-     pass
-class Gun2(Gun):
+
+class Gun2(Gun1):
     def __init__(self):
-        """ Конструктор класса Gun
+        """ Конструктор класса Gun2
 
         Args:
         f2_power - максимальная сила
@@ -344,7 +344,7 @@ class Gun2(Gun):
         self.u=(self.S*GR/math.sin(2*self.bn))**0.5
         
   
-class Target:
+class Target1:
     
     def __init__(self):
         """ Конструктор класса Target
@@ -410,9 +410,8 @@ class Target:
             self.color,
             (self.x, self.y),
             self.r)
-class Target1(Target):
-    pass
-class Target2(Target):
+
+class Target2(Target1):
     def new_target(self):
        'Инициализация новой цели.'
        self.x = randint(600, 780)
@@ -519,9 +518,10 @@ class Enemy():
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+
 balls = []
 targets = []
-
 clock = pygame.time.Clock()
 
 target1 = Target1()
@@ -541,6 +541,7 @@ text0 = font.render("Score: 0",True,BLACK)
 finished = False
 
 while not finished:
+    
     screen.fill(WHITE)
     polygon(screen,WHITE,[(0,0),(200,0),(200,200),(0,200)],0)
     screen.blit(text0, [40,100])
@@ -578,7 +579,8 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
-            #gun.move(event)  
+            for g in tanks:
+                g.move(event)  
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button ==1:
                 for g in tanks: 
