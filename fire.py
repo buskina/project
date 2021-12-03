@@ -16,7 +16,7 @@ CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RUST = ((210,150,75))
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN,RUST, MAGENTA, CYAN]
+
 
 WIDTH = 800
 HEIGHT = 600
@@ -26,6 +26,16 @@ font = pygame.font.Font(None, 25)
 
 class Fire(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Fire
+
+        Args:
+        rect.x - начальное положение огня по горизонтали
+        rect.y - начальное положение огня по вертикали
+        points - начальные очки
+        speedy- скорость по y
+        speedx -скорость по x
+        r- зона контакта с огнем
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
         self.image=targ1_img
@@ -37,10 +47,11 @@ class Fire(pygame.sprite.Sprite):
         self.speedy = 5
         self.speedx = 5
         self.points=0
-        self.r=100
+        self.r=70
      
     
     def update(self):
+        """Обновляет значения x,y, соударение со стенками упругое"""
         self.rect.x += self.speedx
         self.rect.y -= self.speedy
         if self.rect.top > HEIGHT-100  or self.rect.top < 0:
@@ -49,14 +60,17 @@ class Fire(pygame.sprite.Sprite):
             self.speedx=-self.speedx
        
     def hit(self,x1,y1):
-        """Удержание  вцели."""
-        global score, text0
+        """Если мышка на огоньке, считает очки. при 50 игра заканчивается.
+        Если убрать мышку, очки обнуляются"""
         if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
             self.points+=1
             print(self.points)
         else:    
-           self.points=0  
+           self.points=0 
         
+    def fin(self):
+        if self.points==10:
+            finished = True   
            
     
 class Targ(pygame.sprite.Sprite):
@@ -75,6 +89,7 @@ class Targ(pygame.sprite.Sprite):
         self.r=70
 
     def update(self):
+        """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
@@ -82,7 +97,7 @@ class Targ(pygame.sprite.Sprite):
             self.rect.y = randint(-100, -40)
             self.speedy = randint(1, 8)      
     def hit(self,x1,y1):
-        """Попадание  в цель."""
+        """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
         global score, text0
         if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
             score += self.points
@@ -112,12 +127,13 @@ text0 = font.render("Score: 0",True,WHITE)
 finished = False
 
 while not finished:
+    if fire.points==10:
+        finished = True
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     screen.blit(text0, [40,100])
     all_sprites.draw(screen)
     screen.blit(text0, [40,100])
-    
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
@@ -134,8 +150,7 @@ while not finished:
             x1,y1=pygame.mouse.get_pos()
             fire.hit(x1,y1)
     all_sprites.update()     
-    if fire.points==50:
-        finished = True
+    
           
     
     
