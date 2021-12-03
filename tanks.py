@@ -148,6 +148,9 @@ class Targ1(pygame.sprite.Sprite):
         score += self.points
         text0 = font.render("Score: "+str(score),True,BLACK)
         self.kill()
+        m = Targ1()
+        all_sprites.add(m)
+        targets.add(m)
 class Gun1:
 
     def __init__(self):
