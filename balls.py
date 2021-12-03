@@ -2,7 +2,7 @@ from random import choice, randint
 import pygame
 from pygame.draw import *
 pygame.init()
-pygame.display.set_caption("Balls!")
+pygame.display.set_caption("Space!")
 FPS = 30
 from os import path
 
@@ -75,74 +75,45 @@ class Ball:
     
        
 
-class Target:
-    
-    def __init__(self):
-        """ Конструктор класса Target
 
-        Args:
-        points - начальные очки
-        live - начальное число жизней
-        """
-        self.screen = screen
-        self.points = 5
-        self.live = 2
-        self.new_target()
-        
-   
-    def new_target(self):
-       'Инициализация новой цели.'
-       self.x = randint(600, 780)
-       self.y = randint(300, 550)
-       self.r = randint(5, 50)
-       self.color = choice(GAME_COLORS)
-       self.vx = randint(-3, 3)
-       self.vy = randint(-3, 3)
-       self.live = 2
-       targets.append(self)
-    def move(self):
-        """Переместить цель по прошествии единицы времени.
-
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy
-        и стен по краям окна (размер окна 800х600).
-        """
-        pass
-        if self.vx >0 and  self.x+self.r>=WIDTH:
-            self.vx=-self.vx
-        if self.vx <0 and  self.x-self.r<=0:
-            self.vx=-self.vx
-        if self.vy >0 and  self.y+self.r>=HEIGHT:
-            self.vy=-self.vy
-        if self.vy <0 and  self.y-self.r<=0:
-            self.vy=-self.vy
-        self.x += self.vx
-        self.y += self.vy
-    def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r)
-    def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает счет, удаляет шарик,создает новый, меняет радиус игрока
-        """
-        global score, text0
-        if ((self.x-obj.x)**2+(self.y-HEIGHT+obj.y)**2)<=(self.r+obj.r)**2:
-            obj.r=(obj.r+self.r)/2
-            targets.remove(self)
-            self.new_target()
-            score+=self.points
-            text0 = font.render("Score: "+str(score),True,WHITE)
            
 
 
+class Planets(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.k=randint(1,6)
+        pl0_img=pygame.image.load(path.join(img_dir, "pl"+str(self.k)+".png")).convert()
+        self.image=pl0_img
+        self.image = pygame.transform.scale(pl0_img, (70, 70))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,WIDTH - self.rect.width)
+        self.rect.y = randint(-100, -40)
+        self.speedy = randint(1, 8)
+        self.speedx = randint(1, 8)
+        self.points=1
+        self.r=70
 
+    def update(self):
+        """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = randint(0,WIDTH - self.rect.width)
+            self.rect.y = randint(-100, -40)
+            self.speedy = randint(1, 8)      
+    def hit(self,x1,y1):
+        """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
+        global score, text0
+        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
+            score += self.points
+            text0 = font.render("Score: "+str(score),True,WHITE)
+            self.kill()
+            m = Planets()
+            all_sprites.add(m)
+            planets.add(m)
 class Exit(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -161,19 +132,23 @@ img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
 background_rect = background.get_rect()
 exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
+pl1_img = pygame.image.load(path.join(img_dir, "pl1.png")).convert()
+pl2_img = pygame.image.load(path.join(img_dir, "pl2.png")).convert()
+pl3_img = pygame.image.load(path.join(img_dir, "pl3.png")).convert()
+pl4_img = pygame.image.load(path.join(img_dir, "pl4.png")).convert()
+pl5_img = pygame.image.load(path.join(img_dir, "pl5.png")).convert()
+pl6_img = pygame.image.load(path.join(img_dir, "pl6.png")).convert()
+
 all_sprites = pygame.sprite.Group()
-targets = []
+planets = pygame.sprite.Group()
 exit1 = Exit()
 all_sprites.add(exit1)
-
-
 clock = pygame.time.Clock()
+for i in range(4):
+    m = Planets()
+    all_sprites.add(m)
+    planets.add(m)
 
-target1 = Target()
-target2 = Target()
-target3 = Target()
-target4 = Target()
-targets = [target1, target2,target3,target4]
 me=Ball(screen)
 
 text0 = font.render("Score: 0",True,WHITE)
@@ -186,9 +161,6 @@ while not finished:
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
     screen.blit(text0, [40,100])
-    for t in targets:
-        t.move()
-        t.draw()
     me.draw()
        
     all_sprites.draw(screen)  
@@ -204,9 +176,7 @@ while not finished:
                 finished = True
             me.move(event)
             me.draw()
-    for t in targets:
-        t.hittest(me)
-      
+    all_sprites.update()  
           
     
     
