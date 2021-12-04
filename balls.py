@@ -8,7 +8,9 @@ from os import path
 
 
 RED = (255, 0, 0)
-PURPLE = ((240,0,255))
+DPURPLE = (94,0,94)
+LPURPLE = (166,166,255)
+PINK=(255,171,190)
 BLUE = ((0,255,255))
 YELLOW = (230, 230, 0)
 GREEN = ((0,255,0))
@@ -22,55 +24,8 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN,RUST, MAGENTA, CYAN]
 WIDTH = 800
 HEIGHT = 600
 
-score=0
+
 font = pygame.font.Font(None, 25)
-class Ball:
-    def __init__(self, screen: pygame.Surface,x=10, y=HEIGHT-10):
-        """ Конструктор класса Ball
-
-        Args:
-        x - начальное положение мяча по горизонтали
-        y - начальное положение мяча по вертикали
-    
-        """
-        self.screen = screen
-        self.x = 10
-        self.y = 10
-        self.r = 10
-        self.vx = 0
-        self.vy = 0
-        self.color = PURPLE
-        self.live = 30
-        
-    
-
-    def move(self,event):
-        """Переместить мяч по прошествии единицы времени.
-
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy.
-        """
-        
-        if event.key==pygame.K_LEFT:
-                self.vx=-10
-                self.x += self.vx
-        if event.key==pygame.K_RIGHT:
-                self.vx=10
-                self.x += self.vx
-        if event.key==pygame.K_UP:
-                self.vy=10
-                self.y += self.vy
-        if event.key==pygame.K_DOWN:
-                self.vy=-10
-                self.y += self.vy
-
-    def draw(self):
-        'Фнкция рисует мяч'
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, HEIGHT-self.y),
-            self.r)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -84,6 +39,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
+        self.r=40
+        self.score=0
 
     def update(self):
         self.speedx = 0
@@ -119,7 +76,7 @@ class Planets(pygame.sprite.Sprite):
         self.speedy = randint(1, 8)
         self.speedx = randint(1, 8)
         self.points=1
-        self.r=70
+        self.r=40
 
     def update(self):
         """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
@@ -129,12 +86,12 @@ class Planets(pygame.sprite.Sprite):
             self.rect.x = randint(0,WIDTH - self.rect.width)
             self.rect.y = randint(-100, -40)
             self.speedy = randint(1, 8)      
-    def hit(self,x1,y1):
+    def hit(self,obj):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
-        global score, text0
-        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
-            score += self.points
-            text0 = font.render("Score: "+str(score),True,WHITE)
+        global  text0
+        if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
+            obj.score += self.points
+            text0 = font.render("Score: "+str(obj.score),True,WHITE)
             self.kill()
             m = Planets()
             all_sprites.add(m)
@@ -148,10 +105,36 @@ class Exit(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH*2 / 3
-        self.rect.bottom = HEIGHT/6
+        self.rect.bottom = HEIGHT*5/6
         self.speedx = 0
+        self.b=100
+        self.a=150
+        self.min=3
+        self.max=10
+    def draw(self):
+        polygon(screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+                            (WIDTH/2+self.a,HEIGHT/2-self.b),
+                            (WIDTH/2+self.a,HEIGHT/2+self.b),
+                             (WIDTH/2-self.a,HEIGHT/2+self.b)],0)
+        polygon(screen,DPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+                            (WIDTH/2+self.a,HEIGHT/2-self.b),
+                            (WIDTH/2+self.a,HEIGHT/2+self.b),
+                             (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
         
-    
+    def hit(self,obj):
+        """Попадание  в выход"""
+        global  text0
+        if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
+            self.draw()
+            if obj.score < self.min:
+                screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
+            elif obj.score > self.max:
+                screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
+            else:
+                screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
+                screen.blit(text0, [WIDTH/2-40,HEIGHT/2+40])
+            
+            
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
@@ -176,6 +159,9 @@ for i in range(4):
     all_sprites.add(m)
     planets.add(m)
 text0 = font.render("Score: 0",True,WHITE)
+text3 = font.render("Game over!",True,DPURPLE)
+text1 = font.render("У Вас недостотачно очков :(",True,DPURPLE)
+text2 = font.render("Вы слишком большой :)",True,DPURPLE)
 
 
 finished = False
@@ -183,10 +169,10 @@ finished = False
 while not finished:
     screen.fill(BLACK)
     screen.blit(background, background_rect)
+    exit1.hit(player)
     all_sprites.draw(screen)
     screen.blit(text0, [40,100])
     pygame.display.update()
-
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -194,8 +180,10 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
+    for p in planets:
+        p.hit(player)
     all_sprites.update()  
-          
+        
     
     
 
