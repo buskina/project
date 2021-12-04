@@ -32,7 +32,8 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
         self.image=pl1_img
-        self.image = pygame.transform.scale(pl1_img, (70, 70))
+        self.k=40
+        self.image = pygame.transform.scale(pl1_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
@@ -41,6 +42,7 @@ class Player(pygame.sprite.Sprite):
         self.speedy = 0
         self.r=40
         self.score=0
+        
 
     def update(self):
         self.speedx = 0
@@ -65,10 +67,11 @@ class Planets(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.k=randint(2,6)
-        pl0_img=pygame.image.load(path.join(img_dir, "pl"+str(self.k)+".png")).convert()
+        self.k0=randint(2,6)
+        pl0_img=pygame.image.load(path.join(img_dir, "pl"+str(self.k0)+".png")).convert()
         self.image=pl0_img
-        self.image = pygame.transform.scale(pl0_img, (70, 70))
+        self.k=randint(30,90)
+        self.image = pygame.transform.scale(pl0_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = randint(0,WIDTH - self.rect.width)
@@ -91,6 +94,9 @@ class Planets(pygame.sprite.Sprite):
         global  text0
         if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
             obj.score += self.points
+            obj.k=int((obj.k+self.k)/2)
+            obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
+            obj.image.set_colorkey(BLACK)
             text0 = font.render("Score: "+str(obj.score),True,WHITE)
             self.kill()
             m = Planets()
@@ -104,13 +110,13 @@ class Exit(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(exit_img, (60, 60))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.centerx = WIDTH*2 / 3
+        self.rect.centerx = WIDTH*5 / 6
         self.rect.bottom = HEIGHT*5/6
         self.speedx = 0
         self.b=100
         self.a=150
-        self.min=3
-        self.max=10
+        self.min=60
+        self.max=70
     def draw(self):
         polygon(screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
@@ -126,13 +132,16 @@ class Exit(pygame.sprite.Sprite):
         global  text0
         if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
             self.draw()
-            if obj.score < self.min:
+            if obj.k < self.min:
                 screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
-            elif obj.score > self.max:
+            elif obj.k > self.max:
                 screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
             else:
                 screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
                 screen.blit(text0, [WIDTH/2-40,HEIGHT/2+40])
+                for p in planets:
+                    p.speedy = 0
+                    p.speedx = 0
             
             
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -160,7 +169,7 @@ for i in range(4):
     planets.add(m)
 text0 = font.render("Score: 0",True,WHITE)
 text3 = font.render("Game over!",True,DPURPLE)
-text1 = font.render("У Вас недостотачно очков :(",True,DPURPLE)
+text1 = font.render("Вы слишком маленький :(",True,DPURPLE)
 text2 = font.render("Вы слишком большой :)",True,DPURPLE)
 
 
@@ -169,8 +178,9 @@ finished = False
 while not finished:
     screen.fill(BLACK)
     screen.blit(background, background_rect)
-    exit1.hit(player)
+    #exit1.hit(player)
     all_sprites.draw(screen)
+    exit1.hit(player)
     screen.blit(text0, [40,100])
     pygame.display.update()
     clock.tick(FPS)
