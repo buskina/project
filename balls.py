@@ -126,6 +126,11 @@ class Exit(pygame.sprite.Sprite):
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
+    def drawbut(self):
+        polygon(screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+                            (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
+                            (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
+                             (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
         
     def hit(self,obj):
         """Попадание  в выход"""
@@ -138,11 +143,14 @@ class Exit(pygame.sprite.Sprite):
                 screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
             else:
                 screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
-                screen.blit(text0, [WIDTH/2-40,HEIGHT/2+40])
+                screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+                screen.blit(text4, [WIDTH/2-25,HEIGHT/2+42])
                 for p in planets:
                     p.speedy = 0
                     p.speedx = 0
-            
+                    self.drawbut()
+
+               
             
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -168,6 +176,7 @@ for i in range(4):
     all_sprites.add(m)
     planets.add(m)
 text0 = font.render("Score: 0",True,WHITE)
+text4 = font.render("EXIT",True,DPURPLE)
 text3 = font.render("Game over!",True,DPURPLE)
 text1 = font.render("Вы слишком маленький :(",True,DPURPLE)
 text2 = font.render("Вы слишком большой :)",True,DPURPLE)
