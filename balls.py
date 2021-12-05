@@ -29,6 +29,16 @@ font = pygame.font.Font(None, 25)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Player
+        Args:
+        score -  очки
+        speedy- скорость по y
+        speedx -скорость по x
+        k - диаметр игрока
+        r- радиус
+        rect.centerx - начальное положение центра игрока  по горизонтали
+        rect.bottom - начальное положение нижней грани игрока по вертикали
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
         self.image=pl1_img
@@ -40,11 +50,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
-        self.r=40
+        self.r=self.k/2
         self.score=0
+        
         
 
     def update(self):
+        """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
+        Обновляет значения x,y """
         self.speedx = 0
         self.speedy = 0
         keystate = pygame.key.get_pressed()
@@ -65,6 +78,18 @@ class Player(pygame.sprite.Sprite):
 
 class Planets(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Planets
+        Args:
+        rect.x - начальное положение Planets по горизонтали
+        rect.y - начальное положение Planets по вертикали
+        score - начальные очки
+        speedy- скорость по y
+        speedx -скорость по x
+        k - диаметр игрока
+        k0- номер игрока (есть 5 различных изображений, зависящих от номера)
+        r- радиус
+        points- количество очков, получаемое при попадании в планету
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
         self.k0=randint(2,6)
@@ -77,9 +102,10 @@ class Planets(pygame.sprite.Sprite):
         self.rect.x = randint(0,WIDTH - self.rect.width)
         self.rect.y = randint(-100, -40)
         self.speedy = randint(1, 8)
-        self.speedx = randint(1, 8)
+        self.speedx = randint(-8, 8)
         self.points=1
-        self.r=40
+        self.r=self.k/2
+        
 
     def update(self):
         """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
@@ -92,7 +118,7 @@ class Planets(pygame.sprite.Sprite):
     def hit(self,obj):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
         global  text0
-        if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             obj.score += self.points
             obj.k=int((obj.k+self.k)/2)
             obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
@@ -102,8 +128,31 @@ class Planets(pygame.sprite.Sprite):
             m = Planets()
             all_sprites.add(m)
             planets.add(m)
+    def hitp(self,obj):
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+          
+            self.speedx=-self.speedx
+            self.speedy=-self.speedy
+            obj.speedx=-obj.speedx
+            obj.speedy=-obj.speedy
+        
 class Exit(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Exit
+        Args:
+        rect.centerx - начальное положение центра выхода  по горизонтали
+        rect.bottom - начальное положение нижней грани выхода по вертикали
+        score - начальные очки
+        speedy- скорость по y
+        speedx -скорость по x
+        b - высота таблички выхода
+        а - ширина таблички выхода
+        min- минимальный радиус
+        max-максимальный радиус
+        k0- номер игрока (есть 5 различных изображений, зависящих от номера)
+        r- радиус зоны контакта
+        с- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
+        Используется для остановки спрайтов в последующий момент"""
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
         self.image=exit_img
@@ -117,7 +166,9 @@ class Exit(pygame.sprite.Sprite):
         self.min=60
         self.max=70
         self.c=0
+        self.r=20
     def draw(self):
+        """Функция рисует табличку выхода"""
         polygon(screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
@@ -127,6 +178,7 @@ class Exit(pygame.sprite.Sprite):
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
     def drawbut(self):
+        """Функция рисует кнопку выхода"""
         polygon(screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
@@ -137,9 +189,9 @@ class Exit(pygame.sprite.Sprite):
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True   
     def hit(self,obj):
-        """Попадание  в выход"""
+        """Попадание  в область выхода. Выводить табличку с соответсвующей надписью"""
         global  text0
-        if abs(obj.rect.x-self.rect.x)<70 and abs(obj.rect.y-self.rect.y) <70:
+        if abs(obj.rect.x-self.rect.x)<self.r and abs(obj.rect.y-self.rect.y) <self.r:
             self.draw()
             if obj.k < self.min:
                 screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
@@ -206,6 +258,7 @@ while not finished:
                 finished = True
     for p in planets:
         p.hit(player)
+        
     if exit1.c==0:
         all_sprites.update()  
        
