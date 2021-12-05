@@ -117,6 +117,7 @@ class Exit(pygame.sprite.Sprite):
         self.a=150
         self.min=60
         self.max=70
+        self.c=0
     def draw(self):
         polygon(screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
@@ -131,7 +132,11 @@ class Exit(pygame.sprite.Sprite):
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
-        
+    def hitexit(self):
+        """Попадание  в кнопку выхода. Осуществляется выход из игры"""
+        x1,y1=pygame.mouse.get_pos()
+        if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
+            return  True   
     def hit(self,obj):
         """Попадание  в выход"""
         global  text0
@@ -148,7 +153,9 @@ class Exit(pygame.sprite.Sprite):
                 for p in planets:
                     p.speedy = 0
                     p.speedx = 0
-                    self.drawbut()
+                self.drawbut()
+                self.c=1
+                        
 
                
             
@@ -187,13 +194,15 @@ finished = False
 while not finished:
     screen.fill(BLACK)
     screen.blit(background, background_rect)
-    #exit1.hit(player)
     all_sprites.draw(screen)
     exit1.hit(player)
     screen.blit(text0, [40,100])
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if exit1.hitexit() and exit1.c==1:
+                finished = True
         if event.type == pygame.QUIT:
             finished = True
         if event.type == pygame.KEYDOWN:
@@ -202,7 +211,7 @@ while not finished:
     for p in planets:
         p.hit(player)
     all_sprites.update()  
-        
+       
     
     
 
