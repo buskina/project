@@ -112,7 +112,6 @@ class Exit(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH*5 / 6
         self.rect.bottom = HEIGHT*5/6
-        self.speedx = 0
         self.b=100
         self.a=150
         self.min=60
@@ -149,10 +148,7 @@ class Exit(pygame.sprite.Sprite):
             else:
                 screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
                 screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
-                screen.blit(text4, [WIDTH/2-25,HEIGHT/2+42])
-                for p in planets:
-                    p.speedy = 0
-                    p.speedx = 0
+                screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
                 self.drawbut()
                 self.c=1
                         
@@ -210,7 +206,8 @@ while not finished:
                 finished = True
     for p in planets:
         p.hit(player)
-    all_sprites.update()  
+    if exit1.c==0:
+        all_sprites.update()  
        
     
     
