@@ -24,133 +24,9 @@ HEIGHT = 600
 GR=2
 score=0
 font = pygame.font.Font(None, 25)
-class Bul1:
-    def __init__(self, screen: pygame.Surface,x=10, y=HEIGHT-10):
-        """ Конструктор класса Bul1
 
-        Args:
-        x - начальное положение мяча по горизонтали
-        y - начальное положение мяча по вертикали
-    
-        """
-        self.screen = screen
-        self.x = 10
-        self.y = HEIGHT-10
-        self.r = 10
-        self.vx = 0
-        self.vy = 0
-        self.color = choice(GAME_COLORS)
-        self.live = 30
-        
-    
 
-    def move(self):
-        """Переместить снаряд по прошествии единицы времени.
 
-        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
-        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
-        и стен по краям окна (размер окна 800х600).
-        """
-        
-        if (abs(int(self.vy)) < GR) and (int(self.y+self.r)> HEIGHT):
-            balls.remove(self)
-        '''if self.vx >0 and  self.x+self.r>=WIDTH:
-            self.vx=-self.vx
-        if self.vx <0 and  self.x-self.r<=0:
-            self.vx=-self.vx'''
-        if self.vy <0 and  self.y+self.r>=HEIGHT:
-            self.vy=-self.vy
-        '''if self.vy >0 and  self.y-self.r<=0:
-            self.vy=-self.vy'''
-        self.x += self.vx
-        self.vy-=GR
-        self.y -= self.vy-GR/2
-        
-
-    def draw(self):
-        'Фнкция рисует мяч'
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r
-        )
-
-    def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
-        """
-       
-        if ((self.x-obj.rect.x)**2+(self.y-obj.rect.y)**2)<=(self.r+10)**2:
-            
-            
-            return True
-        else:
-            return False
-    def hittest0(self, obj):
-        
-        """Функция проверяет сталкивалкивается ли данный обьект с целью(танком), описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
-        """
-        if ((self.x-obj.x)**2+(HEIGHT-self.y-obj.y)**2)<=(self.r)**2:
-            obj.live-=10
-            return True
-        else:
-            return False
-
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 20))
-        self.image.fill(YELLOW)
-        self.rect = self.image.get_rect()
-        self.rect.bottom = y
-        self.rect.centerx = x
-        self.speedy = -10
-
-    def update(self):
-        self.rect.y += self.speedy
-        # убить, если он заходит за верхнюю часть экрана
-        if self.rect.bottom < 0:
-            self.kill()
-class Targ1(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((40, 40))
-        self.image=targ1_img
-        self.image = pygame.transform.scale(targ1_img, (40, 30))
-        self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
-        self.rect.x = randint(0,WIDTH - self.rect.width)
-        self.rect.y = randint(-100, -40)
-        self.speedy = randint(1, 8)
-        self.speedx = randint(1, 8)
-        self.points=1
-
-    def update(self):
-        self.rect.x += self.speedx
-        self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
-            self.rect.x = randint(0,WIDTH - self.rect.width)
-            self.rect.y = randint(-100, -40)
-            self.speedy = randint(1, 8)      
-    def hit(self):
-        """Попадание шарика в цель."""
-        global score, text0  
-        score += self.points
-        text0 = font.render("Score: "+str(score),True,BLACK)
-        self.kill()
-        m = Targ1()
-        all_sprites.add(m)
-        targets.add(m)
 class Gun1:
 
     def __init__(self):
@@ -178,11 +54,9 @@ class Gun1:
         self.xo=10
         self.yo=10
         self.live=100
-    def check(self):
-        if tank3.x-self.x<=40:
-           self.x-=40
+    
     def move(self,event):
-        self.check()
+       
         if event.key==pygame.K_LEFT:
                 self.vx=-10
                 self.x += self.vx
@@ -351,7 +225,39 @@ class Gun2(Gun1):
         """Считает расстояние до цели S и начальную скорость u"""
         self.S=self.x-obj.x
         self.u=(self.S*GR/math.sin(2*self.bn))**0.5
-        
+class Tank2(pygame.sprite.Sprite):
+    def __init__(self):
+        """ Конструктор класса Player
+        Args:
+        score -  очки
+        speedy- скорость по y
+        speedx -скорость по x
+        rect.centerx - начальное положение центра игрока  по горизонтали
+        rect.bottom - начальное положение нижней грани игрока по вертикали
+        """
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50, 40))
+        self.image=tank1_img
+        self.image = pygame.transform.scale(tank2_img, (100, 100))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = 120
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
+        self.score=0
+        self.to=player1.time+60
+    def update(self):
+        """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
+        Обновляет значения x,y """
+        self.speedx = 0
+    
+        if player1.time < self.to:
+            self.speedx = 10
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0 
+        self.rect.x += self.speedx     
   
 
 
@@ -410,9 +316,172 @@ class Enemy():
             self.Vy=0
             obj.live-=10
             
-       
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        """ Конструктор класса Player
+        Args:
+        score -  очки
+        speedy- скорость по y
+        speedx -скорость по x
+        rect.centerx - начальное положение центра игрока  по горизонтали
+        rect.bottom - начальное положение нижней грани игрока по вертикали
+        """
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50, 40))
+        self.image=tank1_img
+        self.image = pygame.transform.scale(tank1_img, (100, 100))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = 30
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
+        self.speedy = 0
+        self.score=0
+        self.time=0
+        self.f2_power = 10
+        self.f2_on = 0
+        self.an = 1
+        self.bn = 1
+        self.k=1
         
- 
+        
+
+    def update(self):
+        """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
+        Обновляет значения x,y """
+        self.speedx = 0
+        self.speedy = 0
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -8
+        if keystate[pygame.K_RIGHT]:
+            self.speedx = 8
+        if keystate[pygame.K_UP]:
+            self.speedy = -8
+        if keystate[pygame.K_DOWN]:
+            self.speedy = 8
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0  
+            
+    def kill2(self, obj): 
+        self.time+=1
+        if self.time==100:
+            obj.kill()
+            tank2 = Tank2()
+            all_sprites.add(tank2)
+    def fire2_start(self, event):
+        self.f2_on = 1
+        
+
+    def fire2_end(self, event):
+        """Выстрел снарядом.
+
+        Происходит при отпускании кнопки мыши.
+        Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
+        """
+    
+        
+        shell = Shells()
+        all_sprites.add(shell)
+        shells.add(shell)
+        new_ball.x = self.x
+        new_ball.y = HEIGHT-self.y
+        new_ball.r += 5
+        self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
+        new_ball.vx = self.f2_power * math.cos(self.bn)
+        new_ball.vy = self.f2_power * math.sin(self.bn)
+    
+        self.f2_on = 0
+        self.f2_power = 10
+        self.k=1
+      
+    def targetting(self, event):
+        """Прицеливание. Зависит от положения мыши."""
+        if event and event.pos[0]!=self.x:
+            
+            if (event.pos[0]-self.x)>0  :
+                self.bn = math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
+            if (event.pos[0]-self.x)<0:
+                self.bn = 180+math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
+        
+            
+class Shells(pygame.sprite.Sprite):
+    def __init__(self):
+        """ Конструктор класса Planets
+        Args:
+        rect.x - начальное положение Planets по горизонтали
+        rect.y - начальное положение Planets по вертикали
+        score - начальные очки
+        speedy- скорость по y
+        speedx -скорость по x
+        k - диаметр игрока
+        k0- номер игрока (есть 5 различных изображений, зависящих от номера)
+        r- радиус
+        points- количество очков, получаемое при попадании в планету
+        """
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=shell_img
+        self.image = pygame.transform.scale(shell_img, (40, 40))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = -100
+        self.rect.y = -100
+        self.speedy = 0
+        self.speedx = 0
+        self.points=1
+    
+
+    def update(self):
+        """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy-GR/2
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.kill()    
+    def hit(self,obj):
+        """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
+        global  text0
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+            obj.score += self.points
+            obj.k=int((obj.k+self.k)/2)
+            obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
+            obj.image.set_colorkey(BLACK)
+            text0 = font.render("Score: "+str(obj.score),True,WHITE)
+            self.kill()
+class Targ1(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=targ1_img
+        self.image = pygame.transform.scale(targ1_img, (40, 30))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,WIDTH - self.rect.width)
+        self.rect.y = randint(-100, -40)
+        self.speedy = randint(1, 8)
+        self.speedx = randint(1, 8)
+        self.points=1
+
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = randint(0,WIDTH - self.rect.width)
+            self.rect.y = randint(-100, -40)
+            self.speedy = randint(1, 8)      
+    def hit(self):
+        """Попадание шарика в цель."""
+        global score, text0  
+        score += self.points
+        text0 = font.render("Score: "+str(score),True,BLACK)
+        self.kill()
+        m = Targ1()
+        all_sprites.add(m)
+        targets.add(m)            
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -420,10 +489,12 @@ img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'ftanks.png')).convert()
 background_rect = background.get_rect()
 targ1_img = pygame.image.load(path.join(img_dir, "targ1.png")).convert()
-targ2_img = pygame.image.load(path.join(img_dir, "targ2.png")).convert()
+tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
+tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
+shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
-balls = []
+shells = pygame.sprite.Group()
 
 clock = pygame.time.Clock()
 
@@ -431,11 +502,12 @@ for i in range(4):
     m = Targ1()
     all_sprites.add(m)
     targets.add(m)
-tank1=Gun1()
-tank2=Gun1()
-tank3=Gun2()
-tank2.x=90
-tanks=[tank1,tank2]
+
+player1 = Player()
+player2 = Player()
+player2.rect.centerx = 120
+players = pygame.sprite.Group()
+all_sprites.add(player1,player2)
 enemy1=Enemy()
 text0 = font.render("Score: 0",True,BLACK)
 
@@ -447,27 +519,8 @@ while not finished:
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     screen.blit(text0, [40,100])
-    time+=1
     all_sprites.draw(screen)
-    
-    for g in tanks:
-        g.draw()
-    
-    for b in balls:
-        b.draw()
-    if time>t1:
-        tank3.draw()
-        if time <t2:
-            tank3.move()
-        if time % tank3.t==0:
-            tank3.theory(tank1)
-            enemy1.new_ball(tank3)
-        if time >t2 and enemy1.live==1:
-            enemy1.draw()
-            enemy1.hit0(tank1)
-            enemy1.move()  
-                 
-    
+    player1.kill2(player2)
     pygame.display.update()
 
     clock.tick(FPS)
@@ -477,40 +530,7 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
-            for g in tanks:
-                g.move(event)  
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            
-            if event.button ==1:
-                for g in tanks: 
-                    g.fire2_start(event)
-                    g.num=1
-            
-            
-        elif event.type == pygame.MOUSEBUTTONUP:
-            for g in tanks: 
-                if g.num==1:
-                    g.fire2_end1(event)
-                
-            
-        elif event.type == pygame.MOUSEMOTION:
-            for g in tanks: 
-                g.targetting(event)
-          
-    for b in balls:
-        b.move()
-        b.hittest0(tank3)
-        for t in targets:
-            if b.hittest(t):
-                    t.hit()
-                    if b in balls:
-                        balls.remove(b)
-            
-    for g in tanks: 
-        g.power_up()
-    if tank2 in tanks:
-        if time>100:
-            tanks.remove(tank2)
+       
     all_sprites.update()
 
 pygame.quit()
