@@ -148,6 +148,7 @@ class Player(pygame.sprite.Sprite):
         self.f2_on = 0
         self.bn = 1
         self.k=1
+        self.tx=100
     
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
@@ -168,7 +169,7 @@ class Player(pygame.sprite.Sprite):
             
     def kill2(self, obj): 
         self.time+=1
-        if self.time==100:
+        if self.time==self.tx:
             obj.kill()
             tank2 = Tank2()
             all_sprites.add(tank2)
@@ -232,6 +233,7 @@ class Shells(pygame.sprite.Sprite):
         self.speedy = 0
         self.speedx = 0
         self.points=1
+        self.r=35/2
     
 
     def update(self):
@@ -239,18 +241,19 @@ class Shells(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         self.speedy+=GR
         self.rect.y += self.speedy-GR/2
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
-            self.kill()    
+        if  self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.kill() 
+        if self.rect.bottom >= HEIGHT:
+            self.speedy=-self.speedy
+        
     def hit(self,obj):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
-            obj.score += self.points
-            obj.k=int((obj.k+self.k)/2)
-            obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
-            obj.image.set_colorkey(BLACK)
-            text0 = font.render("Score: "+str(obj.score),True,WHITE)
+            player1.score += self.points
+            text0 = font.render("Score: "+str(player1.score),True,WHITE)
             self.kill()
+            obj.kill()
 class Targ1(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -264,6 +267,7 @@ class Targ1(pygame.sprite.Sprite):
         self.speedy = randint(1, 8)
         self.speedx = randint(1, 8)
         self.points=1
+        self.r=35/2
 
     def update(self):
         self.rect.x += self.speedx
@@ -272,15 +276,7 @@ class Targ1(pygame.sprite.Sprite):
             self.rect.x = randint(0,WIDTH - self.rect.width)
             self.rect.y = randint(-100, -40)
             self.speedy = randint(1, 8)      
-    def hit(self):
-        """Попадание шарика в цель."""
-        global score, text0  
-        score += self.points
-        text0 = font.render("Score: "+str(score),True,BLACK)
-        self.kill()
-        m = Targ1()
-        all_sprites.add(m)
-        targets.add(m)            
+             
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -321,6 +317,9 @@ while not finished:
     screen.blit(text0, [40,100])
     all_sprites.draw(screen)
     player1.kill2(player2)
+    for s in shells:
+        for t in targets:
+            s.hit(t)
     pygame.display.update()
 
     clock.tick(FPS)
@@ -343,6 +342,7 @@ while not finished:
                     p.targetting(x1,y1)
     for p in players:
         p.power_up()  
+    
     all_sprites.update()
 
 pygame.quit()
