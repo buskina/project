@@ -25,206 +25,6 @@ GR=2
 score=0
 font = pygame.font.Font(None, 25)
 
-
-
-class Gun1:
-
-    def __init__(self):
-        """ Конструктор класса Gun
-
-        Args:
-        f2_power - максимальная сила
-        bn - угол вылета мяча от горизонта, угол наклона пушки
-        color - цвет пушки
-        attempt- количество попыток
-        """
-        self.screen = screen
-        self.f2_power = 10
-        self.f2_on = 0
-        self.an = 1
-        self.bn = 1
-        self.k=1
-        self.color = GREY
-        self.attempt=0
-        self.num=1
-        self.x=10
-        self.vx=1
-        self.y=10
-        
-        self.xo=10
-        self.yo=10
-        self.live=100
-    
-    def move(self,event):
-       
-        if event.key==pygame.K_LEFT:
-                self.vx=-10
-                self.x += self.vx
-        if event.key==pygame.K_RIGHT:
-                self.vx=10
-                self.x += self.vx
-        
-
-    def fire2_start(self, event):
-        self.f2_on = 1
-        
-
-    def fire2_end1(self, event):
-        """Выстрел мячом 1.
-
-        Происходит при отпускании кнопки мыши.
-        Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
-        """
-        global balls
-        
-        new_ball = Bul1(self.screen)
-        new_ball.x = self.x
-        new_ball.y = HEIGHT-self.y
-        new_ball.r += 5
-        self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.bn)
-        new_ball.vy = self.f2_power * math.sin(self.bn)
-        balls.append(new_ball)
-        self.f2_on = 0
-        self.f2_power = 10
-        self.k=1
-        self.attempt+=1
-    def fire2_end2(self, event):
-        """Выстрел мячом 2.
-
-        Происходит при отпускании кнопки мыши.
-        Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
-        """
-        global balls
-        new_ball = Bul2(self.screen)
-        new_ball.x = self.x
-        new_ball.y = HEIGHT-self.y
-        new_ball.r += 5
-        self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.bn)
-        new_ball.vy = int(self.f2_power * math.sin(self.bn))
-        balls.append(new_ball)
-        self.f2_on = 0
-        self.f2_power = 10
-        self.k=1
-        self.attempt+=1
-        
-        
-    def targetting(self, event):
-        """Прицеливание. Зависит от положения мыши."""
-        if event and event.pos[0]!=self.x:
-            
-            if (event.pos[0]-self.x)>0  :
-                self.bn = math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
-            if (event.pos[0]-self.x)<0:
-                self.bn = 180+math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
-        if self.f2_on:
-            self.color = YELLOW
-        else:
-            self.color = GREY
-
-    def draw(self):
-        L=50+self.k
-        H=5
-        a=20
-        b=10
-        self.xo=self.x+L*math.cos(self.bn)
-        self.yo=HEIGHT-L*math.sin(self.bn)-self.y
-        polygon(screen,self.color,[(self.x,HEIGHT-b-self.y ),
-                            (self.xo,self.yo),
-                            (self.xo-H*math.sin(self.bn),
-                             self.yo-H*math.cos(self.bn)),
-                            (self.x-H*math.sin(self.bn), HEIGHT-b-self.y-H*math.cos(self.bn))],0)
-        polygon(screen,self.color,[(self.x-a,HEIGHT-self.y),
-                            (self.x+a,HEIGHT-self.y),
-                            (self.x+a,HEIGHT-b-self.y),
-                            (self.x-a,HEIGHT-b-self.y)],0)
-        polygon(screen,GREEN,[(5,20 ),
-                            (5+self.live,20),
-                            (5+self.live,25),
-                             (5,25 )],0)
-        polygon(screen,BLACK,[(5,20 ),
-                            (5+100,20),
-                            (5+100,25),
-                             (5,25 )],1)
-
-    def power_up(self):
-        if self.f2_on:
-            if self.f2_power < 100:
-                self.f2_power += 10
-                self.k+=2
-                
-            self.color = YELLOW
-        else:
-            self.color = GREY
-           
-
-class Gun2(Gun1):
-    def __init__(self):
-        """ Конструктор класса Gun2
-
-        Args:
-        f2_power - максимальная сила
-        bn - угол вылета мяча от горизонта, угол наклона пушки
-        color - цвет пушки
-        attempt- количество попыток
-        """
-        self.screen = screen
-        self.f2_power = 10
-        self.f2_on = 0
-        self.an = 1
-        self.bn = 1
-        self.k=1
-        self.color = RED
-        self.attempt=0
-        self.num=1
-        self.x=tank2.x
-        self.vx=5
-        self.y=tank2.y
-        self.vy=1
-        self.xo=20
-        self.yo=10
-        self.t=43
-        self.S=10
-        self.u=10
-        self.live=100
-   
-        
-            
-    def move(self):
-        """Перемещение танка"""
-        
-        self.x+=self.vx
-    def draw(self):
-        """Рисует танк и его жизни"""
-        L=50+self.k
-        H=5
-        a=20
-        b=10
-        self.bn=math.atan(1)
-        self.xo=self.x-L*math.cos(self.bn)
-        self.yo=HEIGHT-L*math.sin(self.bn)-self.y
-        polygon(screen,self.color,[(self.x,HEIGHT-b-self.y ),
-                            (self.xo,self.yo),
-                            (self.xo+H*math.sin(self.bn),
-                             self.yo-H*math.cos(self.bn)),
-                            (self.x+H*math.sin(self.bn), HEIGHT-b-self.y-H*math.cos(self.bn))],0)
-        polygon(screen,self.color,[(self.x-a,HEIGHT-self.y),
-                            (self.x+a,HEIGHT-self.y),
-                            (self.x+a,HEIGHT-b-self.y),
-                            (self.x-a,HEIGHT-b-self.y)],0)
-        polygon(screen,GREEN,[(WIDTH-5,20 ),
-                            (WIDTH-5-self.live,20),
-                            (WIDTH-5-self.live,25),
-                             (WIDTH-5,25 )],0)
-        polygon(screen,BLACK,[(WIDTH-5,20 ),
-                            (WIDTH-5-100,20),
-                            (WIDTH-5-100,25),
-                             (WIDTH-5,25 )],1)
-    def theory(self, obj):
-        """Считает расстояние до цели S и начальную скорость u"""
-        self.S=self.x-obj.x
-        self.u=(self.S*GR/math.sin(2*self.bn))**0.5
 class Tank2(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Player
@@ -257,7 +57,11 @@ class Tank2(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0 
-        self.rect.x += self.speedx     
+        self.rect.x += self.speedx    
+    def theory(self, obj):
+        """Считает расстояние до цели S и начальную скорость u"""
+        self.S=self.x-obj.x
+        self.u=(self.S*GR/math.sin(2*self.bn))**0.5
   
 
 
@@ -329,23 +133,22 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
         self.image=tank1_img
-        self.image = pygame.transform.scale(tank1_img, (100, 100))
+        self.a=100
+        self.image = pygame.transform.scale(tank1_img, (self.a, self.a))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = 30
         self.rect.bottom = HEIGHT - 10
+        self.y=HEIGHT-self.rect.bottom +self.a
         self.speedx = 0
         self.speedy = 0
         self.score=0
         self.time=0
         self.f2_power = 10
         self.f2_on = 0
-        self.an = 1
         self.bn = 1
         self.k=1
-        
-        
-
+    
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
         Обновляет значения x,y """
@@ -356,12 +159,8 @@ class Player(pygame.sprite.Sprite):
             self.speedx = -8
         if keystate[pygame.K_RIGHT]:
             self.speedx = 8
-        if keystate[pygame.K_UP]:
-            self.speedy = -8
-        if keystate[pygame.K_DOWN]:
-            self.speedy = 8
+        
         self.rect.x += self.speedx
-        self.rect.y += self.speedy
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
@@ -373,42 +172,41 @@ class Player(pygame.sprite.Sprite):
             obj.kill()
             tank2 = Tank2()
             all_sprites.add(tank2)
-    def fire2_start(self, event):
+    def fire2_start(self):
         self.f2_on = 1
         
+    def power_up(self):
+        if self.f2_on:
+            if self.f2_power < 100:
+                self.f2_power += 10
+                  
 
-    def fire2_end(self, event):
+    def fire2_end(self):
         """Выстрел снарядом.
 
         Происходит при отпускании кнопки мыши.
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
-    
-        
         shell = Shells()
         all_sprites.add(shell)
         shells.add(shell)
-        new_ball.x = self.x
-        new_ball.y = HEIGHT-self.y
-        new_ball.r += 5
-        self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.bn)
-        new_ball.vy = self.f2_power * math.sin(self.bn)
-    
+        shell.rect.x = self.rect.centerx
+        shell.rect.y = HEIGHT-self.y
+        shell.speedx = self.f2_power * math.cos(self.bn)
+        shell.speedy = self.f2_power * math.sin(self.bn)
         self.f2_on = 0
         self.f2_power = 10
         self.k=1
       
-    def targetting(self, event):
+    def targetting(self, x1,y1):
         """Прицеливание. Зависит от положения мыши."""
-        if event and event.pos[0]!=self.x:
-            
-            if (event.pos[0]-self.x)>0  :
-                self.bn = math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
-            if (event.pos[0]-self.x)<0:
-                self.bn = 180+math.atan((HEIGHT-event.pos[1]-self.y) / (event.pos[0]-self.x))
+        if (x1-self.rect.centerx)>0  :
+                self.bn = math.atan((-y1+self.y) / (x1-self.rect.centerx))
+              
+        if (x1-self.rect.centerx)<0:
+                self.bn = 180+math.atan((-y1+self.y) / (x1-self.rect.centerx))
         
-            
+        
 class Shells(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Planets
@@ -426,7 +224,7 @@ class Shells(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
         self.image=shell_img
-        self.image = pygame.transform.scale(shell_img, (40, 40))
+        self.image = pygame.transform.scale(shell_img, (35, 35))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = -100
@@ -439,6 +237,7 @@ class Shells(pygame.sprite.Sprite):
     def update(self):
         """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
         self.rect.x += self.speedx
+        self.speedy+=GR
         self.rect.y += self.speedy-GR/2
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.kill()    
@@ -508,6 +307,7 @@ player2 = Player()
 player2.rect.centerx = 120
 players = pygame.sprite.Group()
 all_sprites.add(player1,player2)
+players.add(player1,player2)
 enemy1=Enemy()
 text0 = font.render("Score: 0",True,BLACK)
 
@@ -530,7 +330,19 @@ while not finished:
         if event.type == pygame.KEYDOWN:
             if event.key==pygame.K_ESCAPE:
                 finished = True
-       
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button ==1:
+                for p in players:
+                    p.fire2_start()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            for p in players:
+                p.fire2_end()
+        elif event.type == pygame.MOUSEMOTION:
+                x1,y1=pygame.mouse.get_pos()
+                for p in players:    
+                    p.targetting(x1,y1)
+    for p in players:
+        p.power_up()  
     all_sprites.update()
 
 pygame.quit()
