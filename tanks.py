@@ -48,6 +48,9 @@ class Tank2(pygame.sprite.Sprite):
         self.r=100/2
         self.to=player1.time+60
         self.health=100
+        self.bn=math.atan(1)
+        self.f=50
+        self.u=0
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
         Обновляет значения x,y """
@@ -62,8 +65,8 @@ class Tank2(pygame.sprite.Sprite):
         self.rect.x += self.speedx    
     def theory(self, obj):
         """Считает расстояние до цели S и начальную скорость u"""
-        self.S=self.x-obj.x
-        self.u=(self.S*GR/math.sin(2*self.bn))**0.5
+        self.S=self.rect.x-obj.rect.x
+        self.u=int((self.S*GR/2*math.sin(2*self.bn))**0.5)
     def drawl(self):
         polygon(screen,GREEN,[(WIDTH-5,20 ),
                             (WIDTH-5-self.health,20),
@@ -76,62 +79,63 @@ class Tank2(pygame.sprite.Sprite):
     def win(self):
         if self.health<=0:
             return True
-
-
-
-class Enemy(): 
+class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Enemy
+        Args:
+        rect.x - начальное положение Enemy по горизонтали
+        rect.y - начальное положение Enemy по вертикали
+        score - начальные очки
+        speedy- скорость по y
+        speedx -скорость по x
+        
+        r- радиус
+        points- количество очков, получаемое при попадании 
         """
-        self.screen = screen
-        self.points = 2
-        self.live = 0
-        self.xo = 400
-        self.yo = 400
-        self.color = BLACK
-        self.rd=0
-        self.x = self.xo
-        self.y = self.yo
-        self.vy = 1
-        self.vx = 1
-        self.r = randint(20, 50)
-        self.w=0
-    
-    def new_ball(self,obj):
-       'Инициализация нового снаряда.'
-       self.xo = obj.x
-       self.yo = obj.y
-       self.x = self.xo
-       self.y = self.yo
-       self.r = randint(20, 50)
-       self.live = 1
-       self.color = BLACK
-       self.vx=math.cos(obj.bn)*obj.u
-       self.vy=math.sin(obj.bn)*obj.u
-       
-    def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, HEIGHT-self.y),
-            self.r)
-    
-    def move(self):
-        self.x -= self.vx
-        self.y += self.vy-GR/2
-        self.vy-=GR
-    def hit0(self,obj, points=1):
-        """Попадание снаряда в танк."""
-        global score,text0
-        if ((self.x-obj.x)**2+(self.y-obj.y)**2) <= (self.r)**2:
-            score-= points
-            text0 = font.render("Score: "+str(score),True,BLACK)
-            self.x=WIDTH+10
-            self.y=0
-            self.color=WHITE
-            self.Vx=0
-            self.Vy=0
-            obj.live-=10
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=en_img
+        self.image = pygame.transform.scale(en_img, (35, 35))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = 200
+        self.rect.y = 200
+        self.speedy = 10
+        self.speedx = 10
+        self.points=1
+        self.r=35/2
+        
+    def start(self, obj):
+        self.rect.x = obj.rect.x
+        self.rect.y = obj.rect.y
+        self.speedy = -obj.u
+        self.speedx = obj.u
+
+    def update(self):
+        """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
+        self.rect.x -= self.speedx
+        self.speedy+=GR
+        self.rect.y += self.speedy-GR/2
+        if  self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.kill() 
+        if self.rect.bottom >= HEIGHT:
+            self.speedy=-self.speedy
+        
+    def hit0(self,obj):
+        """Попадание  в врага"""
+        global  text0
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+            self.kill()
+            obj.health-=10
+    def hit1(self,obj):
+        """Попадание  в снаряд врага"""
+        global  text0
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+            self.kill()
+            obj.kill()
+
+
+
             
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -163,6 +167,7 @@ class Player(pygame.sprite.Sprite):
         self.k=1
         self.tx=100
         self.health=100
+        self.r=self.a/2
     
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
@@ -233,7 +238,7 @@ class Player(pygame.sprite.Sprite):
         
 class Shells(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Planets
+        """ Конструктор класса Shells
         Args:
         rect.x - начальное положение Planets по горизонтали
         rect.y - начальное положение Planets по вертикали
@@ -298,7 +303,7 @@ class Targ1(pygame.sprite.Sprite):
         self.rect.x = randint(0,WIDTH - self.rect.width)
         self.rect.y = randint(-100, -40)
         self.speedy = randint(1, 8)
-        self.speedx = randint(1, 8)
+        self.speedx = randint(-8, 8)
         self.points=1
         self.r=35/2
 
@@ -320,10 +325,11 @@ targ1_img = pygame.image.load(path.join(img_dir, "targ1.png")).convert()
 tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
 tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
 shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
+en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
 shells = pygame.sprite.Group()
-
+enemy= Enemy()
 clock = pygame.time.Clock()
 
 for i in range(4):
@@ -338,7 +344,6 @@ players = pygame.sprite.Group()
 tank2=Tank2()
 all_sprites.add(player1,player2)
 players.add(player1,player2)
-enemy1=Enemy()
 text0 = font.render("Score: 0",True,BLACK)
 
 
@@ -351,8 +356,17 @@ while not finished:
     screen.blit(text0, [40,100])
     if tank2 in all_sprites:
         tank2.drawl()
+        tank2.theory(player1)
+        if (player1.time % tank2.f)==0:
+            enemy= Enemy()
+            all_sprites.add(enemy)
+            enemy.start(tank2)
+            
         if tank2.win():
             finished = True
+        enemy.hit0(player1)
+        for s in shells:
+            enemy.hit1(s)
     all_sprites.draw(screen)
     player1.drawl()
     
@@ -360,6 +374,7 @@ while not finished:
         player2.kill()
         tank2=Tank2()
         all_sprites.add(tank2)
+    
     for s in shells:
         if tank2 in all_sprites:
             s.hit0(tank2)
