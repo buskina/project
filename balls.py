@@ -11,7 +11,7 @@ RED = (255, 0, 0)
 DPURPLE = (94,0,94)
 LPURPLE = (166,166,255)
 PINK=(255,171,190)
-BLUE = ((0,255,255))
+BLUE = (175,214,255)
 YELLOW = (230, 230, 0)
 GREEN = ((0,255,0))
 MAGENTA = (255, 0, 255)
@@ -183,6 +183,10 @@ class Exit(pygame.sprite.Sprite):
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
+        polygon(screen,BLUE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+                            (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
+                            (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
+                             (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],0)
     def hitexit(self):
         """Попадание  в кнопку выхода. Осуществляется выход из игры"""
         x1,y1=pygame.mouse.get_pos()
@@ -198,10 +202,10 @@ class Exit(pygame.sprite.Sprite):
             elif obj.k > self.max:
                 screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
             else:
+                self.drawbut()
                 screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
                 screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
                 screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
-                self.drawbut()
                 self.c=1
                         
 
