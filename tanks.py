@@ -6,23 +6,13 @@ from os import path
 pygame.init()
 FPS = 30
 
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-YELLOW = (230, 230, 0)
 GREEN = (0, 255, 0)
-MAGENTA = (255, 0, 255)
-CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GREY=(192, 192,192)
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
-time=0
-t1=150
-t2=300
+
 WIDTH = 800
 HEIGHT = 600
 GR=2
-score=0
 font = pygame.font.Font(None, 25)
 
 class Tank2(pygame.sprite.Sprite):
@@ -34,17 +24,22 @@ class Tank2(pygame.sprite.Sprite):
         speedx -скорость по x
         rect.centerx - начальное положение центра игрока  по горизонтали
         rect.bottom - начальное положение нижней грани игрока по вертикали
+        health - здоровье
+        f-интервал времени, с которомы стреляет вражеский танк
+        u - скорость вылета снаряда вдоль осей
+        bn - угол выстрела (45)
+        r- радиус зоны обстрела
+        to- время, до которого танк отъезжает(60 - время движения)
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
-        self.image=tank1_img
+        self.image=tank2_img
         self.image = pygame.transform.scale(tank2_img, (100, 100))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = 120
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
-        self.score=0
         self.r=100/2
         self.to=player1.time+60
         self.health=100
@@ -68,6 +63,7 @@ class Tank2(pygame.sprite.Sprite):
         self.S=self.rect.x-obj.rect.x
         self.u=int((self.S*GR/2*math.sin(2*self.bn))**0.5)
     def drawl(self):
+        """Отображает здоровье врага"""
         polygon(screen,GREEN,[(WIDTH-5,20 ),
                             (WIDTH-5-self.health,20),
                             (WIDTH-5-self.health,25),
@@ -76,7 +72,8 @@ class Tank2(pygame.sprite.Sprite):
                             (WIDTH-5-100,20),
                             (WIDTH-5-100,25),
                              (WIDTH-5,25 )],1)
-    def win(self):
+    def fin1(self):
+        """Окончание игры, если выиграли"""
         if self.health<=0:
             return True
 class Enemy(pygame.sprite.Sprite):
@@ -88,7 +85,7 @@ class Enemy(pygame.sprite.Sprite):
         score - начальные очки
         speedy- скорость по y
         speedx -скорость по x
-        
+        points-очки, которые снимаются при попадании в игрока
         r- радиус
         points- количество очков, получаемое при попадании 
         """
@@ -98,14 +95,15 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(en_img, (35, 35))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.x = 200
-        self.rect.y = 200
+        self.rect.x = WIDTH+100
+        self.rect.y = -200
         self.speedy = 10
         self.speedx = 10
         self.points=1
         self.r=35/2
         
     def start(self, obj):
+        """"Функция задает начальные координаты и скорости снаряду"""
         self.rect.x = obj.rect.x
         self.rect.y = obj.rect.y
         self.speedy = -obj.u
@@ -122,13 +120,19 @@ class Enemy(pygame.sprite.Sprite):
             self.speedy=-self.speedy
         
     def hit0(self,obj):
-        """Попадание  в врага"""
+        """Попадание  в врага. Снижает его здоровье"""
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
-            self.kill()
+            self.rect.x = WIDTH+100
+            self.rect.y = -200
+            self.speedy = 0
+            self.speedx = 0
             obj.health-=10
+            obj.score-=self.points
+            text0 = font.render("Score: "+str(player1.score),True,BLACK)
+            
     def hit1(self,obj):
-        """Попадание  в снаряд врага"""
+        """Попадание  в снаряд врага. Удаляет оба объекта"""
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             self.kill()
@@ -186,17 +190,13 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0  
-            
-    def kill2(self, obj): 
-        self.time+=1
-        if self.time==self.tx:
-            obj.kill()
-            tank2=Tank2()
-            all_sprites.add(tank2)
+                      
     def fire2_start(self):
+        """Начало стрельбы"""
         self.f2_on = 1
         
     def power_up(self):
+        """Увеличивает скорость при выстреле при удержании мыши"""
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 10
@@ -227,6 +227,7 @@ class Player(pygame.sprite.Sprite):
         if (x1-self.rect.centerx)<0:
                 self.bn = 180+math.atan((-y1+self.y) / (x1-self.rect.centerx))
     def drawl(self):
+        """Отображает здоровье игрока"""
         polygon(screen,GREEN,[(5,20 ),
                             (5+self.health,20),
                             (5+self.health,25),
@@ -235,20 +236,22 @@ class Player(pygame.sprite.Sprite):
                             (5+100,20),
                             (5+100,25),
                              (5,25 )],1)    
+    def fin2(self):
+        """Окончание игры, если проиграли"""
+        if self.health<=0:
+            return True
         
 class Shells(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Shells
         Args:
-        rect.x - начальное положение Planets по горизонтали
-        rect.y - начальное положение Planets по вертикали
+        rect.x - начальное положение снаряда по горизонтали
+        rect.y - начальное положение снаряда по вертикали
         score - начальные очки
         speedy- скорость по y
         speedx -скорость по x
-        k - диаметр игрока
-        k0- номер игрока (есть 5 различных изображений, зависящих от номера)
         r- радиус
-        points- количество очков, получаемое при попадании в планету
+        points- количество очков, получаемое при попадании в цель
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -262,8 +265,6 @@ class Shells(pygame.sprite.Sprite):
         self.speedx = 0
         self.points=1
         self.r=35/2
-        
-    
 
     def update(self):
         """Обновляет значения x,y, при вылете из видимой зоны обновляет rect.x, rect.y,speedy """
@@ -280,7 +281,7 @@ class Shells(pygame.sprite.Sprite):
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             player1.score += self.points
-            text0 = font.render("Score: "+str(player1.score),True,WHITE)
+            text0 = font.render("Score: "+str(player1.score),True,BLACK)
             self.kill()
             obj.kill()
     def hit0(self,obj):
@@ -288,12 +289,20 @@ class Shells(pygame.sprite.Sprite):
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             player1.score += self.points
-            text0 = font.render("Score: "+str(player1.score),True,WHITE)
+            text0 = font.render("Score: "+str(player1.score),True,BLACK)
             self.kill()
             obj.health-=10
     
 class Targ1(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Targ1
+        Args:
+        rect.x - начальное положение цели по горизонтали
+        rect.y - начальное положение цели по вертикали
+        speedy- скорость по y
+        speedx -скорость по x
+        r- радиус
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
         self.image=targ1_img
@@ -304,10 +313,10 @@ class Targ1(pygame.sprite.Sprite):
         self.rect.y = randint(-100, -40)
         self.speedy = randint(1, 8)
         self.speedx = randint(-8, 8)
-        self.points=1
         self.r=35/2
 
     def update(self):
+        """Обновляет координаты цели, задает заново при вылете за экран"""
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
@@ -332,7 +341,7 @@ shells = pygame.sprite.Group()
 enemy= Enemy()
 clock = pygame.time.Clock()
 
-for i in range(4):
+for i in range(5):
     m = Targ1()
     all_sprites.add(m)
     targets.add(m)
@@ -362,7 +371,9 @@ while not finished:
             all_sprites.add(enemy)
             enemy.start(tank2)
             
-        if tank2.win():
+        if tank2.fin1():
+            finished = True
+        if player1.fin2():
             finished = True
         enemy.hit0(player1)
         for s in shells:
