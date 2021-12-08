@@ -9,7 +9,8 @@ FPS = 30
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
+SALMON = (246,246,117)
+ORANGE = (255,128,0)
 WIDTH = 800
 HEIGHT = 600
 GR=2
@@ -323,7 +324,54 @@ class Targ1(pygame.sprite.Sprite):
             self.rect.x = randint(0,WIDTH - self.rect.width)
             self.rect.y = randint(-100, -40)
             self.speedy = randint(1, 8)      
-             
+class Exit():
+    def __init__(self):
+        """ Конструктор класса Exit
+        Args:
+        
+        b - высота таблички выхода
+        а - ширина таблички выхода
+        с- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
+        Используется для остановки спрайтов в последующий момент"""
+        self.b=100
+        self.a=150
+        self.c=0
+    def draw(self):
+        """Функция рисует рамку выхода"""
+        polygon(screen,SALMON,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+                            (WIDTH/2+self.a,HEIGHT/2-self.b),
+                            (WIDTH/2+self.a,HEIGHT/2+self.b),
+                             (WIDTH/2-self.a,HEIGHT/2+self.b)],0)
+        polygon(screen,ORANGE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+                            (WIDTH/2+self.a,HEIGHT/2-self.b),
+                            (WIDTH/2+self.a,HEIGHT/2+self.b),
+                             (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
+    def drawbut(self):
+        """Функция рисует кнопку выхода"""
+        polygon(screen,ORANGE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+                            (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
+                            (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
+                             (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
+    def end1(self):
+        """Первая концовка игры - выигрыш. Функция выводит соответствующую надпись и счет,
+        вызывает функцию рисования кнопки"""
+        self.c=1
+        self.draw()
+        screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
+        screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
+        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        self.drawbut()
+    def end2(self):
+        """Проигрыш.Рисует табличку с надписью"""
+        self.c=1
+        self.draw()
+        screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
+        screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+    def hitexit(self):
+        """Попадание  в кнопку выхода. Осуществляется выход из игры"""
+        x1,y1=pygame.mouse.get_pos()
+        if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
+            return  True              
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -354,7 +402,11 @@ tank2=Tank2()
 all_sprites.add(player1,player2)
 players.add(player1,player2)
 text0 = font.render("Score: 0",True,BLACK)
-
+text01 = font.render("Score: 0",True,ORANGE)
+text1 = font.render("YOU WIN!",True,ORANGE)
+text2 = font.render("YOU LOSED",True,ORANGE)
+text4 = font.render("EXIT",True,ORANGE)
+exit0=Exit()
 
 finished = False
 
@@ -372,9 +424,9 @@ while not finished:
             enemy.start(tank2)
             
         if tank2.fin1():
-            finished = True
+            exit0.end1()
         if player1.fin2():
-            finished = True
+            exit0.end2()
         enemy.hit0(player1)
         for s in shells:
             enemy.hit1(s)
@@ -401,9 +453,9 @@ while not finished:
             if event.key==pygame.K_ESCAPE:
                 finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button ==1:
                 for p in players:
                     p.fire2_start()
+
         elif event.type == pygame.MOUSEBUTTONUP:
             for p in players:
                 p.fire2_end()
@@ -413,7 +465,7 @@ while not finished:
                     p.targetting(x1,y1)
     for p in players:
         p.power_up()  
-    
-    all_sprites.update()
+    if exit0.c==0:    
+        all_sprites.update()
 
 pygame.quit()
