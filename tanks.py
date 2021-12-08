@@ -367,6 +367,8 @@ class Exit():
         self.draw()
         screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
         screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        self.drawbut()
     def hitexit(self):
         """Попадание  в кнопку выхода. Осуществляется выход из игры"""
         x1,y1=pygame.mouse.get_pos()
@@ -453,8 +455,10 @@ while not finished:
             if event.key==pygame.K_ESCAPE:
                 finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-                for p in players:
-                    p.fire2_start()
+            if exit0.hitexit() and exit0.c==1:
+                finished = True
+            for p in players:
+                p.fire2_start()
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for p in players:
