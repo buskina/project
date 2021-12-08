@@ -9,15 +9,11 @@ FPS = 30
 RED = (255, 0, 0)
 PURPLE = (240,0,255)
 BLUE = (175,214,255)
-YELLOW = (230, 230, 0)
-GREEN = ((0,255,0))
-MAGENTA = (255, 0, 255)
-CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RUST = (210,150,75)
 DBLUE=(0,0,128)
-DPURPLE = (94,0,94)
+DPURPLE = (70,0,70)
 
 WIDTH = 800
 HEIGHT = 600
@@ -72,6 +68,17 @@ class Fire(pygame.sprite.Sprite):
     
 class Targ(pygame.sprite.Sprite):
     def __init__(self):
+        """ Конструктор класса Terg
+
+        Args:
+        rect.x - начальное положение огня по горизонтали
+        rect.y - начальное положение огня по вертикали
+        points - число очков, которе дается при попадании в цель
+        speedy- скорость по y
+        speedx -скорость по x
+        r- радиус зоны контакта с целью
+        
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
         self.image=targ1_img
@@ -95,7 +102,7 @@ class Targ(pygame.sprite.Sprite):
             self.speedy = randint(1, 8)      
     def hit(self,x1,y1):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
-        global score, text0
+        global score, text0, text01
         if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
             score += self.points
             text0 = font.render("Score: "+str(score),True,WHITE)
@@ -111,13 +118,13 @@ class Exit():
         
         b - высота таблички выхода
         а - ширина таблички выхода
-        min- минимальный радиус
         с- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
         Используется для остановки спрайтов в последующий момент"""
         self.b=100
         self.a=150
         self.c=0
     def draw(self):
+        """Функция рисует рамку выхода"""
         polygon(screen,BLUE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
@@ -127,11 +134,14 @@ class Exit():
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
     def drawbut(self):
+        """Функция рисует кнопку выхода"""
         polygon(screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
     def end1(self):
+        """Первая концовка игры - выигрыш. Функция выводит соответствующую надпись и счет,
+        вызывает функцию рисования кнопки"""
         self.c=1
         self.draw()
         screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
@@ -139,6 +149,7 @@ class Exit():
         screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def end2(self):
+        """Проигрыш.Рисует табличку с надписью"""
         self.c=1
         self.draw()
         screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
@@ -163,7 +174,6 @@ all_sprites.add(fire)
 
 text0 = font.render("Score: 0",True,WHITE)
 text01 = font.render("Score: 0",True,DPURPLE)
-text3 = font.render("EXIT",True,DPURPLE)
 text1 = font.render("YOU WIN!",True,DPURPLE)
 text2 = font.render("YOU LOSED",True,DPURPLE)
 text4 = font.render("EXIT",True,DPURPLE)
