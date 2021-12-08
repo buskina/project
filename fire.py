@@ -45,7 +45,7 @@ class Fire(pygame.sprite.Sprite):
         self.speedx = 5
         self.points=0
         self.r=70
-        self.time=100000
+        self.time=100
      
     
     def update(self):
@@ -153,7 +153,9 @@ class Exit():
         self.c=1
         self.draw()
         screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
-        screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+        screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
+        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        self.drawbut()
     def hitexit(self):
         """Попадание  в кнопку выхода. Осуществляется выход из игры"""
         x1,y1=pygame.mouse.get_pos()
@@ -205,6 +207,8 @@ while not finished:
             if event.key==pygame.K_ESCAPE:
                 finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            if exit1.hitexit() and exit1.c==1:
+                finished = True
             x1,y1=pygame.mouse.get_pos()
             for t in targets:
                 t.hit(x1,y1)
