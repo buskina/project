@@ -74,7 +74,7 @@ class Tank2(pygame.sprite.Sprite):
                             (WIDTH-5-100,25),
                              (WIDTH-5,25 )],1)
     def fin1(self):
-        """Окончание игры, если выиграли"""
+        """Окончание игры, если выиграли.Проверяет здоровье игрока"""
         if self.health<=0:
             return True
 class Enemy(pygame.sprite.Sprite):
@@ -123,7 +123,7 @@ class Enemy(pygame.sprite.Sprite):
     def hit0(self,obj):
         """Попадание  в врага. Снижает его здоровье"""
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.rect.x = WIDTH+100
             self.rect.y = -200
             self.speedy = 0
@@ -135,9 +135,13 @@ class Enemy(pygame.sprite.Sprite):
     def hit1(self,obj):
         """Попадание  в снаряд врага. Удаляет оба объекта"""
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.kill()
             obj.kill()
+            m=Explode()
+            all_sprites.add(m)
+            m.rect.centerx = obj.rect.centerx
+            m.rect.centery=obj.rect.centery
 
 
 
@@ -238,7 +242,7 @@ class Player(pygame.sprite.Sprite):
                             (5+100,25),
                              (5,25 )],1)    
     def fin2(self):
-        """Окончание игры, если проиграли"""
+        """Окончание игры, если проиграли.Проверяет здоровье игрока"""
         if self.health<=0:
             return True
         
@@ -280,15 +284,17 @@ class Shells(pygame.sprite.Sprite):
     def hit(self,obj):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
             self.kill()
             obj.kill()
+            
+            
     def hit0(self,obj):
         """Попадание  в врага"""
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
             self.kill()
@@ -374,7 +380,37 @@ class Exit():
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True              
+class Explode(pygame.sprite.Sprite):
+    def __init__(self):
+        """ Конструктор класса explode
+        Args:
+        rect.x - начальное положение цели по горизонтали
+        rect.y - начальное положение цели по вертикали
+        
+        """
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=exp_img
+        self.k=40
+        self.image = pygame.transform.scale(exp_img, (self.k, self.k))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,WIDTH - self.rect.width)
+        self.rect.y = randint(-100, -40)
+        self.t=10
+        self.tx=5
 
+    def update(self):
+        """Обновляет диаметри изображения в зависимости от времени. До tx увеличивает, затем уменьшает"""
+        self.t-=1
+        if self.t==0:
+            self.kill()
+        if self.t>self.tx:
+            self.k+=5
+        if self.t<=self.tx:
+            self.k-=1
+        self.image = pygame.transform.scale(exp_img, (self.k, self.k))
+        self.image.set_colorkey(BLACK)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -385,6 +421,7 @@ tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
 tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
 shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
 en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
+exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
 shells = pygame.sprite.Group()
