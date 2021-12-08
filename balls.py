@@ -12,14 +12,8 @@ DPURPLE = (94,0,94)
 LPURPLE = (166,166,255)
 PINK=(255,171,190)
 BLUE = (175,214,255)
-YELLOW = (230, 230, 0)
-GREEN = ((0,255,0))
-MAGENTA = (255, 0, 255)
-CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RUST = ((210,150,75))
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN,RUST, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
@@ -31,7 +25,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Player
         Args:
-        score -  очки
+        score -  счет очков
         speedy- скорость по y
         speedx -скорость по x
         k - диаметр игрока
@@ -102,7 +96,7 @@ class Planets(pygame.sprite.Sprite):
         self.rect.x = randint(0,WIDTH - self.rect.width)
         self.rect.y = randint(-100, -40)
         self.speedy = randint(1, 8)
-        self.speedx = randint(-8, 8)
+        self.speedx = randint(-3, 3)
         self.points=1
         self.r=self.k/2
         
@@ -129,13 +123,19 @@ class Planets(pygame.sprite.Sprite):
             all_sprites.add(m)
             planets.add(m)
     def hitp(self,obj):
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
-          
-            self.speedx=-self.speedx
-            self.speedy=-self.speedy
-            obj.speedx=-obj.speedx
-            obj.speedy=-obj.speedy
-        
+        """Столкновение сд ругими планетамию Упругое соударение при контакте"""
+        if self.rect.centery>0:
+            if  (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <=(self.r+obj.r)**2:
+                if obj.rect.centerx-self.rect.centerx>=0:
+                    self.speedx=-abs(self.speedx)
+                    obj.speedx=abs(obj.speedx)
+                    self.rect.centerx-=self.r/5
+                    obj.rect.centerx+=obj.r/5
+                else:
+                    self.speedx=abs(self.speedx)
+                    obj.speedx=-abs(obj.speedx)
+                    self.rect.centerx+=self.r/5
+                    obj.rect.centerx-=obj.r/5  
 class Exit(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Exit
@@ -195,7 +195,7 @@ class Exit(pygame.sprite.Sprite):
     def hit(self,obj):
         """Попадание  в область выхода. Выводить табличку с соответсвующей надписью"""
         global  text0
-        if abs(obj.rect.x-self.rect.x)<self.r and abs(obj.rect.y-self.rect.y) <self.r:
+        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             self.draw()
             if obj.k < self.min:
                 screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
@@ -262,6 +262,8 @@ while not finished:
                 finished = True
     for p in planets:
         p.hit(player)
+        for i in planets:
+            p.hitp(i)
         
     if exit1.c==0:
         all_sprites.update()  
