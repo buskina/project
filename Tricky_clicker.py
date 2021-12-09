@@ -15,6 +15,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+YELLOW = (255, 201, 31)
 BLUE = (0, 0, 255)
 
 # Создаем игру и окно
@@ -30,7 +31,7 @@ class Cell:
          Args:
          x - положение центра ячейки по горизонтали
          y - положение центра ячейки по вертикали
-         type - параметр наполнения ячейки (0 - закрыта, 1 - пустая, 2 - обычная, 3 - обнуляет все очки)
+         type - параметр наполнения ячейки (0 - закрыта, 1 - пустая, 2 - обычная, 3 - обнуляет все очки, 4 - замораживает время)
          time - время до закрытия ячейки
          chosen - в ячейку предлагается поместить новый объект
          """
@@ -53,6 +54,10 @@ class Cell:
             elif self.type==3:
                 pygame.draw.rect(self.screen, 
                 BLUE, (self.x*CELLSIZE, self.y*CELLSIZE, 
+                CELLSIZE, CELLSIZE))
+            elif self.type==4:
+                pygame.draw.rect(self.screen, 
+                YELLOW, (self.x*CELLSIZE, self.y*CELLSIZE, 
                 CELLSIZE, CELLSIZE))
             else:
                 pygame.draw.rect(self.screen, 
@@ -79,7 +84,7 @@ class Cell:
         заполнение, меняем тип и время открытия на случайные. Если ячейка закрыта, ничего не происходит.
         """
         if self.chosen:
-            self.type = randint(1,3)
+            self.type = randint(1,4)
             self.time = randint(30,60)
             self.chosen = 0
 
@@ -141,7 +146,7 @@ def draw(field, number_of_cells):
             field[i][j].draw()
 
 
-def testing(field, number_of_cells, event, score):
+def testing(field, number_of_cells, event, score, time_of_ending):
     """
     Функция проверки попадания в ячейку для каждой ячейки поля
     """
@@ -152,8 +157,10 @@ def testing(field, number_of_cells, event, score):
                     score-=1
                 elif field[i][j].type==3:
                     score = 0
-                else:
+                elif field[i][j].type==2:
                     score+=3
+                if field[i][j].type==4:
+                    time_of_ending+=3
                 field[i][j].type=0
                 field[i][j].time=0
                 field[i][j].chosen=0
@@ -164,7 +171,7 @@ def testing(field, number_of_cells, event, score):
                     if field[x][y].type==0:
                         field[x][y].chosen = True
                         chosen = True
-    return score
+    return score, time_of_ending
 
 def finishing(time_of_ending):
     now = int(time.time())
@@ -204,7 +211,7 @@ while not_finished:
         if event.type == pygame.QUIT:
             not_finished = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            score = testing(field, CELLNUM, event, score)
+            score, time_of_ending = testing(field, CELLNUM, event, score, time_of_ending)
             action(field, CELLNUM)
             pygame.display.update()       
     
