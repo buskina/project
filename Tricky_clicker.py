@@ -100,7 +100,6 @@ class Cell:
                 if field[x][y].type == 0:
                     field[x][y].chosen = True
                     chosen = True
-        
 
 def fielding(number_of_cells):
     """
@@ -146,7 +145,7 @@ def draw(field, number_of_cells):
             field[i][j].draw()
 
 
-def testing(field, number_of_cells, event, score, time_of_ending):
+def testing(field, number_of_cells, event, Game_manager):
     """
     Функция проверки попадания в ячейку для каждой ячейки поля
     """
@@ -154,13 +153,13 @@ def testing(field, number_of_cells, event, score, time_of_ending):
         for j in range(number_of_cells):
             if field[i][j].clicktest(event):
                 if field[i][j].type==1:
-                    score-=1
+                    Game_manager[0]-=1
                 elif field[i][j].type==3:
-                    score = 0
+                    Game_manager[0] = 0
                 elif field[i][j].type==2:
-                    score+=3
+                    Game_manager[0]+=3
                 if field[i][j].type==4:
-                    time_of_ending+=3
+                    Game_manager[1]+=3
                 field[i][j].type=0
                 field[i][j].time=0
                 field[i][j].chosen=0
@@ -171,38 +170,38 @@ def testing(field, number_of_cells, event, score, time_of_ending):
                     if field[x][y].type==0:
                         field[x][y].chosen = True
                         chosen = True
-    return score, time_of_ending
-
-def finishing(time_of_ending):
-    now = int(time.time())
-    left = time_of_ending - now
-    if left>=0:
-        min = left//60
-        sec = left - 60*min
-        min_sec_format = '{:02d}:{:02d}'.format(min, sec)
-        return min_sec_format
-    else:
-        return 'Time is up!'
 
 
 field=fielding(CELLNUM)
 planting(field, CELLNUM)
-score = 0
-secs = 15
-time_of_ending = int(time.time())+secs
+Game_manager = [0, 0, 0, 0]
+Game_manager[1] = 15
+counter = 0
 
 not_finished = True
 while not_finished:
+    counter+=1
+    if Game_manager[1]>=0:
+        min = Game_manager[1]//60
+        sec = Game_manager[1] - 60*min
+        min_sec_format = '{:02d}:{:02d}'.format(min, sec)
+        timevalue = min_sec_format
+    else:
+        timevalue = 'Time is up!'
+    if counter>FPS:
+        counter = 0
+        Game_manager[1] -=1
+
     screen.fill(WHITE)
 
     action(field, CELLNUM)
     draw(field, CELLNUM)
 
     font=pygame.font.Font(None, 36)
-    scorevalue="score = "+str(score)
+    scorevalue="score = "+str(Game_manager[0])
     scoreboard=font.render(scorevalue, True, BLACK)
     screen.blit(scoreboard, (650, 50))
-    timeboard=font.render(finishing(time_of_ending), True, BLACK)
+    timeboard=font.render(timevalue, True, BLACK)
     screen.blit(timeboard, (650, 100))
     pygame.display.update()
     clock.tick(FPS)
@@ -211,7 +210,7 @@ while not_finished:
         if event.type == pygame.QUIT:
             not_finished = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            score, time_of_ending = testing(field, CELLNUM, event, score, time_of_ending)
+            testing(field, CELLNUM, event, Game_manager)
             action(field, CELLNUM)
             pygame.display.update()       
     
