@@ -1,4 +1,6 @@
 import pygame
+import numpy as np
+import time
 from random import *
 
 
@@ -164,9 +166,23 @@ def testing(field, number_of_cells, event, score):
                         chosen = True
     return score
 
+def finishing(time_of_ending):
+    now = int(time.time())
+    left = time_of_ending - now
+    if left>=0:
+        min = left//60
+        sec = left - 60*min
+        min_sec_format = '{:02d}:{:02d}'.format(min, sec)
+        return min_sec_format
+    else:
+        return 'Time is up!'
+
+
 field=fielding(CELLNUM)
 planting(field, CELLNUM)
 score = 0
+secs = 15
+time_of_ending = int(time.time())+secs
 
 not_finished = True
 while not_finished:
@@ -179,6 +195,8 @@ while not_finished:
     scorevalue="score = "+str(score)
     scoreboard=font.render(scorevalue, True, BLACK)
     screen.blit(scoreboard, (650, 50))
+    timeboard=font.render(finishing(time_of_ending), True, BLACK)
+    screen.blit(timeboard, (650, 100))
     pygame.display.update()
     clock.tick(FPS)
 
