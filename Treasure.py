@@ -1,6 +1,8 @@
 import pygame
 from random import *
 import numpy as np
+from PIL import Image
+from os import path
 
 
 WIDTH = 800
@@ -29,15 +31,24 @@ y = randint(0,HEIGHT)
 radmax = max(np.sqrt(x**2+y**2), max(np.sqrt(x**2+(HEIGHT-y)**2), 
 max(np.sqrt((WIDTH-x)**2+y**2), np.sqrt((WIDTH-x)**2+(HEIGHT-y)**2))))
 
-n = int(radmax/5+1)
+n = int(radmax/20+2)
 
 for i in range(n):
     colors.append((255*i/n, 0, 255-255*i/n))
 
-for i in range(1,n,1):
-    pygame.draw.circle(screen, colors[i], (x, y), 5*(n-i))
+layer = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
-pygame.draw.circle(screen, WHITE, (x, y), 5)
+for i in range(1,n,1):
+    pygame.draw.circle(layer, colors[i], (x, y), 20*(n-i))
+
+pygame.draw.circle(layer, WHITE, (x, y), 5)
+
+img_dir = path.join(path.dirname(__file__), 'img2')
+background = pygame.image.load(path.join(img_dir, 'treasure2.jpg')).convert()
+background_rect = background.get_rect()
+screen.blit(background, background_rect)
+
+screen.blit(layer, (0, 0), (30, 30, 80, 80))
 
 pygame.display.update()
 clock = pygame.time.Clock()
