@@ -40,17 +40,19 @@ layer = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 for i in range(1,n,1):
     pygame.draw.circle(layer, colors[i], (x, y), 20*(n-i))
 pygame.draw.circle(layer, WHITE, (x, y), 5)
+layer = pygame.transform.scale(layer, (WIDTH, int(HEIGHT/3)))
 
 # Установка фона
 img_dir = path.join(path.dirname(__file__), 'img2')
 background = pygame.image.load(path.join(img_dir, 'treasure2.jpg')).convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 background_rect = background.get_rect()
 screen.blit(background, background_rect)
 
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
-sec = 15
+sec = 30
 counter = 0
 
 while not finished:
@@ -79,16 +81,17 @@ while not finished:
             finished = True
         elif event.type == pygame.MOUSEMOTION:
             x1,y1=pygame.mouse.get_pos()
-            screen.blit(layer, (x1-10, y1-10), (x1-10, y1-10, 20, 20))
+            screen.blit(layer, (x1-10, y1-10), (x1-10, y1-2*HEIGHT/3-10, 20, 20))
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x1,y1=pygame.mouse.get_pos()
-            if x-10<=x1 and x1<=x+10 and y-10<=y1 and y1<=y+10:
+            y1-=2*HEIGHT/3
+            if x-10<=x1 and x1<=x+10 and y/3-10<=y1 and y1<=y/3+10:
                 scorevalue="Victory!"
                 finished = True
             else:
                 scorevalue="Oops! You've lost"
                 finished = True
-                
+
     # Экран выхода из игры
     if finished:
         screen.fill(BLACK)
