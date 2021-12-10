@@ -5,7 +5,7 @@ from os import path
 pygame.init()
 pygame.display.set_caption("Follow to the fire!")
 FPS = 30
-
+#задаем цвета
 RED = (255, 0, 0)
 PURPLE = (240,0,255)
 BLUE = (175,214,255)
@@ -14,10 +14,10 @@ WHITE = (255, 255, 255)
 RUST = (210,150,75)
 DBLUE=(0,0,128)
 DPURPLE = (70,0,70)
-
+#задаем ширину и высоту экрана
 WIDTH = 800
 HEIGHT = 600
-
+#счет очков
 score=0
 font = pygame.font.Font(None, 25)
 
@@ -28,10 +28,13 @@ class Fire(pygame.sprite.Sprite):
         Args:
         rect.x - начальное положение огня по горизонтали
         rect.y - начальное положение огня по вертикали
-        points - начальные очки
+        points -  очки, получаемые при наведении на огонек
+        pointmax- необходимое число очков
         speedy- скорость по y
         speedx -скорость по x
         r- зона контакта с огнем
+        time-время, за которое  игрок должен успеть выполнить задание. 
+        Иначе игра заканчивается проигрышем
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -44,6 +47,7 @@ class Fire(pygame.sprite.Sprite):
         self.speedy = 5
         self.speedx = 5
         self.points=0
+        self.pointmax=10
         self.r=70
         self.time=100
      
@@ -194,7 +198,7 @@ while not finished:
     screen.blit(text0, [40,100])
     all_sprites.draw(screen)
     screen.blit(text0, [40,100])
-    if fire.points==10:
+    if fire.points==fire.pointmax:
         exit1.end1()
     elif fire.time<=0:
         exit1.end2()
