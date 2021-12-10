@@ -5,15 +5,17 @@ from pygame.draw import *
 from os import path
 pygame.init()
 FPS = 30
-
+#задаем цвета
 GREEN = (0, 255, 0)
 DGREEN = (59, 94, 69)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 SALMON = (246,246,117)
 ORANGE = (255,128,0)
+#задаем ширину и высоту экрана
 WIDTH = 800
 HEIGHT = 600
+#задаем ускорение свободного падения
 GR=2
 font = pygame.font.Font(None, 25)
 
@@ -148,11 +150,24 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Player
         Args:
-        score -  очки
-        speedy- скорость по y
+        image - изображение
+        score -  счет
+        time - счетчик времени
         speedx -скорость по x
         rect.centerx - начальное положение центра игрока  по горизонтали
         rect.bottom - начальное положение нижней грани игрока по вертикали
+        f2_power - сила выстрела.Определяет скорость снаряда
+        f2_on - 0 None 1 режим стрельбы
+        bn- угол прицеливания
+        r- радиус зоны контакта
+        health-здоровье.При 0 проигрыш
+        color-цвет ствола
+        L-длина ствола по оси x
+        xo-конец ствола по оси x
+        yo-конец ствола по оси y
+        a-сдвиг ствола относительно центра танка по оси x
+        b-конец ствола относительно центра танка по оси y
+        H-толщина ствола
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
@@ -165,13 +180,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.y=HEIGHT-self.rect.bottom +self.a
         self.speedx = 0
-        self.speedy = 0
         self.score=0
         self.time=0
         self.f2_power = 10
         self.f2_on = 0
         self.bn = 1
-        self.k=1
         self.tx=100
         self.health=100
         self.r=self.a/2
@@ -179,16 +192,14 @@ class Player(pygame.sprite.Sprite):
         self.xo=0
         self.yo=0
         self.a=5
-        self.L=50
+        self.L=40
         self.b=5
         self.H=5
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
-        Обновляет значения x,y """
+        Обновляет значения x """
         self.speedx = 0
-        self.speedy = 0
         self.time+=1
-        self.gun()
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
             self.speedx = -8
@@ -208,8 +219,9 @@ class Player(pygame.sprite.Sprite):
     def power_up(self):
         """Увеличивает скорость при выстреле при удержании мыши"""
         if self.f2_on:
-            if self.f2_power < 100:
-                self.f2_power += 10
+            if self.f2_power < 50:
+                self.f2_power += 5
+                
                   
 
     def fire2_end(self):
@@ -227,7 +239,7 @@ class Player(pygame.sprite.Sprite):
         shell.speedy = -self.f2_power * math.sin(self.bn)
         self.f2_on = 0
         self.f2_power = 10
-        self.k=1
+        self.L=40
         
       
     def targetting(self, x1,y1):
@@ -248,6 +260,7 @@ class Player(pygame.sprite.Sprite):
                              (5,25 )],1)   
     def gun(self):
         """Функция рисует ствол танка. Зависит от угла прицеливания"""
+        self.L+=self.f2_power/100
         self.xo=self.rect.centerx+self.a+self.L*math.cos(self.bn)
         self.yo=-self.L*math.sin(self.bn)+self.rect.centery-self.b
         polygon(screen,self.color,[(self.rect.centerx+self.a,self.rect.centery-self.b),
@@ -323,6 +336,7 @@ class Shells(pygame.sprite.Sprite):
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
+            text01 = font.render("Score: "+str(player1.score),True,ORANGE)
             self.kill()
             obj.health-=10
     
@@ -469,10 +483,12 @@ class Expl2(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
         self.image.set_colorkey(BLACK)
 pygame.init()
+#задаем папку, где хранятся изображения и фон  
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'ftanks.png')).convert()
 background_rect = background.get_rect()
+#добавляем изображения
 targ1_img = pygame.image.load(path.join(img_dir, "targ1.png")).convert()
 tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
 tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
@@ -481,16 +497,17 @@ en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
 exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
 exp2_img = pygame.image.load(path.join(img_dir, "exp2.png")).convert()
 all_sprites = pygame.sprite.Group()
+#создаем группу целей,снарядов, вражеский снаряд
 targets = pygame.sprite.Group()
 shells = pygame.sprite.Group()
 enemy= Enemy()
 clock = pygame.time.Clock()
-
+#добавляем цели
 for i in range(5):
     m = Targ1()
     all_sprites.add(m)
     targets.add(m)
-
+#создаем игрока, врага, выход
 player1 = Player()
 player2 = Player()
 player2.rect.centerx = 120
@@ -498,76 +515,80 @@ players = pygame.sprite.Group()
 tank2=Tank2()
 all_sprites.add(player1,player2)
 players.add(player1,player2)
+exit0=Exit()
+#надписи при окончании игры
 text0 = font.render("Score: 0",True,BLACK)
 text01 = font.render("Score: 0",True,ORANGE)
 text1 = font.render("YOU WIN!",True,ORANGE)
 text2 = font.render("YOU LOSED",True,ORANGE)
 text4 = font.render("EXIT",True,ORANGE)
-exit0=Exit()
 
+# Переменная, отвечающая за начало общего цикла игры.
 finished = False
-
+# Запуск цикла игры
 while not finished:
     
     screen.fill(BLACK)
-    screen.blit(background, background_rect)
-    screen.blit(text0, [40,100])
+    screen.blit(background, background_rect)#отрисовка фона
+    screen.blit(text0, [40,100])#выводит счет
     
-    if tank2 in all_sprites:
+    if tank2 in all_sprites:#если уже создан враг
+    #отрисовывает его, расчитывает необходимую скорость снаряда
         tank2.drawl()
         tank2.theory(player1)
-        if (player1.time % tank2.f)==0:
+        if (player1.time % tank2.f)==0:#стреляет в игрока с периодом f
             enemy= Enemy()
             all_sprites.add(enemy)
             enemy.start(tank2)
             
-        if tank2.fin1():
+        if tank2.fin1():#выигрыш
             exit0.end1()
-        if player1.fin2():
+        if player1.fin2():#проигрыш
             exit0.end2()
-        enemy.hit0(player1)
+        enemy.hit0(player1)#попадание в игрока
         for s in shells:
-            enemy.hit1(s)
+            enemy.hit1(s)#попадание в cнаряд врага
     for p in players:
-        p.gun()
+        p.gun() #отрисовка ствола танка
     all_sprites.draw(screen)
-    player1.drawl()
+    player1.drawl()#отрисовка здоровья игрока
     
-    if player1.time==player1.tx:
+    if player1.time==player1.tx:#Замена друга на врага в tx
         player2.kill()
         tank2=Tank2()
         all_sprites.add(tank2)
     
     for s in shells:
         if tank2 in all_sprites:
-            s.hit0(tank2)
+            s.hit0(tank2)#попадание в танк врага
         for t in targets:
-            s.hit(t)
+            s.hit(t)#попадание в цель
     pygame.display.update()
 
     clock.tick(FPS)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:#выход через программу
             finished = True
         if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:
+            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
                 finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if exit0.hitexit() and exit0.c==1:
+            if exit0.hitexit() and exit0.c==1:#выход при нажатии кнопки в игре
                 finished = True
             for p in players:
-                p.fire2_start()
+                p.fire2_start()#начало выстрела игрока при нажатии мыши
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for p in players:
-                p.fire2_end()
+                p.fire2_end()#конец выстрела игрока при отпускании мыши
         elif event.type == pygame.MOUSEMOTION:
                 x1,y1=pygame.mouse.get_pos()
                 for p in players:    
-                    p.targetting(x1,y1)
+                    p.targetting(x1,y1)#прицеливание при удержании мыши
     for p in players:
-        p.power_up()
-    if exit0.c==0:    
+        p.power_up()#разряжает оружие
+    if exit0.c==0:
+        # Обновляем координаты всех объектов если игра не закончена
         all_sprites.update()
 
 pygame.quit()
