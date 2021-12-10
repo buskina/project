@@ -88,9 +88,7 @@ class Targ(pygame.sprite.Sprite):
         speedy: type int- скорость по y
         speedx: type int -скорость по x
         points: type int -  очки, получаемые при нажатии на светлячка
-        
         r: type int- радиус зоны контакта с целью
-        
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -128,10 +126,9 @@ class Exit():
     def __init__(self):
         """ Конструктор класса Exit
         Args:
-        
-        b - высота таблички выхода
-        а - ширина таблички выхода
-        с- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
+        b: type int - высота таблички выхода
+        а: type int - ширина таблички выхода
+        с: type int- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
         Используется для остановки спрайтов в последующий момент"""
         self.b=100
         self.a=150
@@ -170,67 +167,76 @@ class Exit():
         screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def hitexit(self):
-        """Попадание  в кнопку выхода. Осуществляется выход из игры"""
+        """Возвращает True при попадании  в кнопку выхода. 
+        Осуществляется выход из игры"""
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True  
     
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+#задаем папку, где хранятся изображения и фон 
 img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load(path.join(img_dir, 'f3.png')).convert()
 background_rect = background.get_rect()
+#добавляем изображение целей
 targ1_img = pygame.image.load(path.join(img_dir, "light.png")).convert()
+#добавляем изображение огня
 fire_img = pygame.image.load(path.join(img_dir, "fire.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
 fire=Fire()
+#создаем выход
 exit1=Exit()
+#добавляем огонь к спрайтам
 all_sprites.add(fire)
-
+#добавляем  цели
+for i in range(4):
+    m = Targ()
+    all_sprites.add(m)
+    targets.add(m)
+#надписи при окончании игры
 text0 = font.render("Score: 0",True,WHITE)
 text01 = font.render("Score: 0",True,DPURPLE)
 text1 = font.render("YOU WIN!",True,DPURPLE)
 text2 = font.render("YOU LOSED",True,DPURPLE)
 text4 = font.render("EXIT",True,DPURPLE)
-for i in range(4):
-    m = Targ()
-    all_sprites.add(m)
-    targets.add(m)
 clock = pygame.time.Clock()
 
-
+# Переменная, отвечающая за начало общего цикла игры.
 finished = False
-
+# Запуск цикла игры
 while not finished:    
     screen.fill(BLACK)
-    screen.blit(background, background_rect)
+    screen.blit(background, background_rect)# рисуем фон
     screen.blit(text0, [40,100])
     all_sprites.draw(screen)
-    screen.blit(text0, [40,100])
+    #выигрыш при нужном числе очков огня
     if fire.points==fire.pointmax:
         exit1.end1()
+    #проигрыш, если время истекло
     elif fire.time<=0:
         exit1.end2()
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:#выход через программу
             finished = True
         if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:
+            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
                 finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if exit1.hitexit() and exit1.c==1:
+            if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
                 finished = True
             x1,y1=pygame.mouse.get_pos()
             for t in targets:
-                t.hit(x1,y1)
+                t.hit(x1,y1)#проверка нажатия на цели
         elif event.type == pygame.MOUSEMOTION:
             if exit1.c==0:
                 x1,y1=pygame.mouse.get_pos()
-                fire.hit(x1,y1)
+                fire.hit(x1,y1)#проверка контакта с огнем
     if exit1.c==0:
-        all_sprites.update()     
+        #обновление всех спрайтов если игра не окончена
+        all_sprites.update() 
     
           
     
