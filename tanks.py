@@ -564,7 +564,6 @@ text01 = font.render("Score: 0",True,ORANGE)
 text1 = font.render("YOU WIN!",True,ORANGE)
 text2 = font.render("YOU LOSED",True,ORANGE)
 text4 = font.render("EXIT",True,ORANGE)
-
 # Переменная, отвечающая за начало общего цикла игры.
 finished = False
 # Запуск цикла игры
