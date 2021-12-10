@@ -7,6 +7,7 @@ pygame.init()
 FPS = 30
 
 GREEN = (0, 255, 0)
+DGREEN = (59, 94, 69)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 SALMON = (246,246,117)
@@ -142,10 +143,7 @@ class Enemy(pygame.sprite.Sprite):
             all_sprites.add(m)
             m.rect.centerx = obj.rect.centerx
             m.rect.centery=obj.rect.centery
-
-
-
-            
+      
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Player
@@ -177,13 +175,20 @@ class Player(pygame.sprite.Sprite):
         self.tx=100
         self.health=100
         self.r=self.a/2
-    
+        self.color=DGREEN
+        self.xo=0
+        self.yo=0
+        self.a=5
+        self.L=50
+        self.b=5
+        self.H=5
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
         Обновляет значения x,y """
         self.speedx = 0
         self.speedy = 0
         self.time+=1
+        self.gun()
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
             self.speedx = -8
@@ -216,21 +221,21 @@ class Player(pygame.sprite.Sprite):
         shell = Shells()
         all_sprites.add(shell)
         shells.add(shell)
-        shell.rect.x = self.rect.centerx
-        shell.rect.y = HEIGHT-self.y
+        shell.rect.x = self.xo
+        shell.rect.y = self.yo
         shell.speedx = self.f2_power * math.cos(self.bn)
-        shell.speedy = self.f2_power * math.sin(self.bn)
+        shell.speedy = -self.f2_power * math.sin(self.bn)
         self.f2_on = 0
         self.f2_power = 10
         self.k=1
+        
       
     def targetting(self, x1,y1):
-        """Прицеливание. Зависит от положения мыши."""
+        """Прицеливание.Расчитывает угол, под которым целится игрок. Зависит от положения мыши."""
         if (x1-self.rect.centerx)>0  :
-                self.bn = math.atan((-y1+self.y) / (x1-self.rect.centerx))
-              
+                self.bn = math.atan((-y1+self.rect.centery) / (x1-self.rect.centerx)) 
         if (x1-self.rect.centerx)<0:
-                self.bn = 180+math.atan((-y1+self.y) / (x1-self.rect.centerx))
+                self.bn = 180+math.atan((-y1+self.rect.centery) / (x1-self.rect.centerx))
     def drawl(self):
         """Отображает здоровье игрока"""
         polygon(screen,GREEN,[(5,20 ),
@@ -240,7 +245,24 @@ class Player(pygame.sprite.Sprite):
         polygon(screen,BLACK,[(5,20 ),
                             (5+100,20),
                             (5+100,25),
-                             (5,25 )],1)    
+                             (5,25 )],1)   
+    def gun(self):
+        """Функция рисует ствол танка. Зависит от угла прицеливания"""
+        self.xo=self.rect.centerx+self.a+self.L*math.cos(self.bn)
+        self.yo=-self.L*math.sin(self.bn)+self.rect.centery-self.b
+        polygon(screen,self.color,[(self.rect.centerx+self.a,self.rect.centery-self.b),
+                            (self.xo,self.yo),
+                            (self.xo-self.H*math.sin(self.bn),
+                             self.yo-self.H*math.cos(self.bn)),
+                            (self.rect.centerx+self.a-self.H*math.sin(self.bn),
+                             -self.b+self.rect.centery-self.H*math.cos(self.bn))],0)
+        polygon(screen,BLACK,[(self.rect.centerx+self.a,self.rect.centery-self.b),
+                            (self.xo,self.yo),
+                            (self.xo-self.H*math.sin(self.bn),
+                             self.yo-self.H*math.cos(self.bn)),
+                            (self.rect.centerx+self.a-self.H*math.sin(self.bn),
+                             -self.b+self.rect.centery-self.H*math.cos(self.bn))],1)
+        
     def fin2(self):
         """Окончание игры, если проиграли.Проверяет здоровье игрока"""
         if self.health<=0:
@@ -490,6 +512,7 @@ while not finished:
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     screen.blit(text0, [40,100])
+    
     if tank2 in all_sprites:
         tank2.drawl()
         tank2.theory(player1)
@@ -505,6 +528,8 @@ while not finished:
         enemy.hit0(player1)
         for s in shells:
             enemy.hit1(s)
+    for p in players:
+        p.gun()
     all_sprites.draw(screen)
     player1.drawl()
     
@@ -541,7 +566,7 @@ while not finished:
                 for p in players:    
                     p.targetting(x1,y1)
     for p in players:
-        p.power_up()  
+        p.power_up()
     if exit0.c==0:    
         all_sprites.update()
 
