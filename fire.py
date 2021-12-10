@@ -26,14 +26,15 @@ class Fire(pygame.sprite.Sprite):
         """ Конструктор класса Fire
 
         Args:
-        rect.x - начальное положение огня по горизонтали
-        rect.y - начальное положение огня по вертикали
-        points -  очки, получаемые при наведении на огонек
-        pointmax- необходимое число очков
-        speedy- скорость по y
-        speedx -скорость по x
-        r- зона контакта с огнем
-        time-время, за которое  игрок должен успеть выполнить задание. 
+        image: type pygame.Surface - изображение огня
+        rect.x: type int - начальное положение огня по горизонтали
+        rect.y: type int - начальное положение огня по вертикали
+        speedy: type int- скорость по y
+        speedx: type int -скорость по x
+        points: type int -  очки, получаемые при наведении на огонек
+        pointmax: type int- необходимое число очков
+        r: type int- зона контакта с огнем
+        time: type int-время, за которое  игрок должен успеть выполнить задание. 
         Иначе игра заканчивается проигрышем
         """
         pygame.sprite.Sprite.__init__(self)
@@ -53,7 +54,11 @@ class Fire(pygame.sprite.Sprite):
      
     
     def update(self):
-        """Обновляет значения x,y, соударение со стенками упругое"""
+        """
+        Обновляет значения x,y
+        Соударение со стенками упругое
+        Работает счетчик времени
+        """
         self.rect.x += self.speedx
         self.rect.y -= self.speedy
         if self.rect.top > HEIGHT-100  or self.rect.top < 0:
@@ -63,7 +68,9 @@ class Fire(pygame.sprite.Sprite):
         self.time-=1
        
     def hit(self,x1,y1):
-        """Если мышка на огоньке, считает очки. при 50 игра заканчивается.
+        """
+        x1,y1: type tuple-позиция мыши
+        Если мышка на огоньке, считает очки. при 50 игра заканчивается.
         Если убрать мышку, очки обнуляются"""
         if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
             self.points+=1
@@ -72,15 +79,17 @@ class Fire(pygame.sprite.Sprite):
     
 class Targ(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Terg
+        """ Конструктор класса Targ
 
         Args:
-        rect.x - начальное положение огня по горизонтали
-        rect.y - начальное положение огня по вертикали
-        points - число очков, которе дается при попадании в цель
-        speedy- скорость по y
-        speedx -скорость по x
-        r- радиус зоны контакта с целью
+        image: type pygame.Surface - изображение светлячка
+        rect.x: type int - начальное положение по горизонтали
+        rect.y: type int - начальное положение по вертикали
+        speedy: type int- скорость по y
+        speedx: type int -скорость по x
+        points: type int -  очки, получаемые при нажатии на светлячка
+        
+        r: type int- радиус зоны контакта с целью
         
         """
         pygame.sprite.Sprite.__init__(self)
@@ -107,7 +116,7 @@ class Targ(pygame.sprite.Sprite):
     def hit(self,x1,y1):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая"""
         global score, text0, text01
-        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
+        if ((x1-self.rect.centerx)**2+(y1-self.rect.centery)**2)<=(self.r)**2:
             score += self.points
             text0 = font.render("Score: "+str(score),True,WHITE)
             text01 = font.render("Score: "+str(score),True,DPURPLE)
