@@ -48,17 +48,20 @@ background = pygame.image.load(path.join(img_dir, 'treasure2.jpg')).convert()
 background_rect = background.get_rect()
 screen.blit(background, background_rect)
 
-screen.blit(layer, (0, 0), (30, 30, 80, 80))
-
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
 while not finished:
+    screen.fill(BLACK)
+    screen.blit(background, background_rect)
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
+        elif event.type == pygame.MOUSEMOTION:
+            x1,y1=pygame.mouse.get_pos()
+            screen.blit(layer, (x1-10, y1-10), (x1-10, y1-10, 20, 20))
     pygame.display.update()
 
 
