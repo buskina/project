@@ -289,6 +289,10 @@ class Shells(pygame.sprite.Sprite):
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
             self.kill()
             obj.kill()
+            m=Expl2()
+            all_sprites.add(m)
+            m.rect.centerx = obj.rect.centerx
+            m.rect.centery=obj.rect.centery
             
             
     def hit0(self,obj):
@@ -411,6 +415,37 @@ class Explode(pygame.sprite.Sprite):
             self.k-=1
         self.image = pygame.transform.scale(exp_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
+class Expl2(pygame.sprite.Sprite):
+    def __init__(self):
+        """ Конструктор класса explode
+        Args:
+        rect.x - начальное положение цели по горизонтали
+        rect.y - начальное положение цели по вертикали
+        
+        """
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((40, 40))
+        self.image=exp2_img
+        self.k=40
+        self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(0,WIDTH - self.rect.width)
+        self.rect.y = randint(-100, -40)
+        self.t=10
+        self.tx=5
+
+    def update(self):
+        """Обновляет диаметри изображения в зависимости от времени. До tx увеличивает, затем уменьшает"""
+        self.t-=1
+        if self.t==0:
+            self.kill()
+        if self.t>self.tx:
+            self.k+=5
+        if self.t<=self.tx:
+            self.k-=1
+        self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
+        self.image.set_colorkey(BLACK)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -422,6 +457,7 @@ tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
 shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
 en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
 exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
+exp2_img = pygame.image.load(path.join(img_dir, "exp2.png")).convert()
 all_sprites = pygame.sprite.Group()
 targets = pygame.sprite.Group()
 shells = pygame.sprite.Group()
