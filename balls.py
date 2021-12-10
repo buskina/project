@@ -21,16 +21,30 @@ font = pygame.font.Font(None, 25)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Player
-        Args:
-        image: type pygame.Surface - изображение игрока
-        speedx: type int -скорость по x
-        speedy: type int -скорость по y
-        rect.centerx: type int - начальное положение центра игрока  по горизонтали
-        rect.bottom: type int - начальное положение нижней грани игрока по вертикали
-        k: type int - диаметр
-        r: type float - радиус зоны контакта
-        score: type int -  счет
+        """
+        Конструктор класса Player
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение игрока
+        speedx: type int 
+            скорость по x
+        speedy: type int 
+            скорость по y
+        rect.centerx: type int 
+            начальное положение центра игрока  по горизонтали
+        rect.bottom: type int 
+            начальное положение нижней грани игрока по вертикали
+        k: type int 
+            диаметр
+        r: type float
+            радиус зоны контакта
+        score: type int 
+            счет
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
@@ -69,17 +83,32 @@ class Player(pygame.sprite.Sprite):
 
 class Planets(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Planets
-        Args:
-        image: type pygame.Surface - изображение игрока
-        k0: type int- номер игрока (есть 5 различных изображений, зависящих от номера)
-        rect.x: type int - начальное положение Planets по горизонтали
-        rect.y: type int - начальное положение Planets по вертикали
-        speedx: type int -скорость по x
-        speedy: type int -скорость по y
-        k: type int - диаметр
-        r: type float - радиус зоны контакта
-        points: type int- количество очков, получаемое при попадании в планету
+        """ 
+        Конструктор класса Planets
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение игрока
+        k0: type int
+            номер игрока (есть 5 различных изображений, зависящих от номера)
+        rect.x: type int 
+            начальное положение Planets по горизонтали
+        rect.y: type int 
+            начальное положение Planets по вертикали
+        speedx: type int 
+            скорость по x
+        speedy: type int 
+            скорость по y
+        k: type int 
+            диаметр
+        r: type float 
+            радиус зоны контакта
+        points: type int
+            количество очков, получаемое при попадании в планету
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -108,7 +137,12 @@ class Planets(pygame.sprite.Sprite):
             self.speedy = randint(1, 8)      
     def hit(self,obj):
         """
+        Parameters
+        ----------
         obj: type __main__.Player
+        
+        Returns text0
+        
         Проверяет попадание  в цель. 
         Добавляются очки, обновляется счет
         удаляется цель, создается новая
@@ -126,9 +160,16 @@ class Planets(pygame.sprite.Sprite):
             planets.add(m)
     def hitp(self,obj):
         """
-        obj: type __main__.Planets
         Столкновение сд ругими планетами.
         Упругое соударение  по оси х при контакте
+        
+        Parameters
+        ----------
+        obj: type __main__.Planets
+        
+        Returns None.
+        -------
+        
         """
         if self.rect.centery>0:
             if  (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <=(self.r+obj.r)**2:
@@ -144,18 +185,35 @@ class Planets(pygame.sprite.Sprite):
                     obj.rect.centerx-=obj.r/5  
 class Exit(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Exit
-        Args:
-        image: type pygame.Surface - изображение выхода
-        rect.centerx: type int -  положение центра выхода по горизонтали
-        rect.bottom: type int -  положение низа выхода по вертикали
-        r: type int - радиус зоны контакта
-        b: type int - высота таблички выхода
-        а: type int - ширина таблички выхода
-        min: type int- минимальный радиус
-        max: type int-максимальный радиус
-        с: type int- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
-        Используется для остановки спрайтов в последующий момент"""
+        """
+        Конструктор класса Exit
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение выхода
+        rect.centerx: type int 
+            положение центра выхода по горизонтали
+        rect.bottom: type int 
+            положение низа выхода по вертикали
+        r: type int 
+            радиус зоны контакта
+        b: type int 
+            высота таблички выхода
+        а: type int 
+            ширина таблички выхода
+        min: type int
+            минимальный радиус
+        max: type int
+            максимальный радиус
+        с: type int
+            принимает значение 0 в течение всей игры,
+            пока игрок не попадет на выход.
+            Используется для остановки спрайтов в последующий момент
+        
+        Returns None.
+        -------
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
         self.image=exit_img
@@ -193,14 +251,23 @@ class Exit(pygame.sprite.Sprite):
     def hitexit(self):
         """Осуществляется выход из игры.
         Возвращает True при попадании в кнопку выхода
+        
+        Returns True
         """
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True   
     def hit(self,obj):
         """
+        Попадание игрока в область выхода.
+        Выводить табличку с соответсвующей надписью
+        
+        Parameters
+        ----------
         obj: type __main__.Player
-        Попадание игрока в область выхода. Выводить табличку с соответсвующей надписью
+        
+        Returns None.
+        -------
         """
         global  text0
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
