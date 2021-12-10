@@ -131,7 +131,7 @@ class Enemy(pygame.sprite.Sprite):
     def hit0(self,obj):
         """Попадание  в врага. Снижает его здоровье
         obj: type __main__.Player"""
-        global  text0
+        global  text0, text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.rect.x = WIDTH+100
             self.rect.y = -200
@@ -140,11 +140,11 @@ class Enemy(pygame.sprite.Sprite):
             obj.health-=10
             obj.score-=self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
+            text01 = font.render("Score: "+str(player1.score),True,ORANGE)
             
     def hit1(self,obj):
         """Попадание  в снаряд врага. Удаляет оба объекта
         obj: type __main__.Targ1"""
-        global  text0
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.kill()
             obj.kill()
@@ -285,11 +285,16 @@ class Player(pygame.sprite.Sprite):
                              self.yo-self.H*math.cos(self.bn)),
                             (self.rect.centerx+self.a-self.H*math.sin(self.bn),
                              -self.b+self.rect.centery-self.H*math.cos(self.bn))],1)
-    def check(self,obj):   
+    def check(self,obj): 
+        """
+        obj: type __main__.Tank2
+        Функция проверяет расстояние между игроком и врагом
+        Если игрок слишком близко, отталкивает его назад"""
         if obj.rect.left-self.rect.right<=10:
             self.rect.right-=10
     def fin2(self):
-        """Окончание игры, если проиграли.Проверяет здоровье игрока"""
+        """Окончание игры, если проиграли.Проверяет здоровье игрока
+        Возвращает True при выполнении условия"""
         if self.health<=0:
             return True
         
@@ -336,6 +341,7 @@ class Shells(pygame.sprite.Sprite):
         Обновляются значения text0 и text01
         obj: type __main__.Targ1
         """
+        global  text0,text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
@@ -355,6 +361,7 @@ class Shells(pygame.sprite.Sprite):
         Удаляется снаряд, уменьшается здоровье врага
         obj: type __main__.Tank2
         """
+        global  text0,text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score),True,BLACK)
@@ -366,11 +373,12 @@ class Targ1(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса Targ1
         Args:
-        rect.x - начальное положение цели по горизонтали
-        rect.y - начальное положение цели по вертикали
-        speedy- скорость по y
-        speedx -скорость по x
-        r- радиус
+        image: type pygame.Surface - изображение цели
+        rect.x: type int - начальное положение цели по горизонтали
+        rect.y: type int - начальное положение цели по вертикали
+        speedy: type int- скорость по y
+        speedx: type int -скорость по x
+        r: type float- радиус
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -397,9 +405,9 @@ class Exit():
         """ Конструктор класса Exit
         Args:
         
-        b - высота таблички выхода
-        а - ширина таблички выхода
-        с- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
+        b: type int - высота таблички выхода
+        а: type int - ширина таблички выхода
+        с: type int- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
         Используется для остановки спрайтов в последующий момент"""
         self.b=100
         self.a=150
@@ -438,7 +446,8 @@ class Exit():
         screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def hitexit(self):
-        """Попадание  в кнопку выхода. Осуществляется выход из игры"""
+        """Попадание  в кнопку выхода. Осуществляется выход из игры.
+        Возвращает True"""
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True              
@@ -446,9 +455,14 @@ class Explode(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса explode
         Args:
-        rect.x - начальное положение цели по горизонтали
-        rect.y - начальное положение цели по вертикали
-        
+        image: type pygame.Surface - изображение взрыва
+        rect.x: type int - начальное положение по горизонтали
+        rect.y: type int - начальное положение по вертикали
+        speedy: type int- скорость по y
+        speedx: type int -скорость по x
+        k: type int- диаметр
+        t: type int- время существования
+        tx: type int - время, до которого увеличивается
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -463,7 +477,8 @@ class Explode(pygame.sprite.Sprite):
         self.tx=5
 
     def update(self):
-        """Обновляет диаметри изображения в зависимости от времени. До tx увеличивает, затем уменьшает"""
+        """Обновляет диаметри изображения в зависимости от времени. 
+        До tx увеличивает, затем уменьшает"""
         self.t-=1
         if self.t==0:
             self.kill()
@@ -477,9 +492,14 @@ class Expl2(pygame.sprite.Sprite):
     def __init__(self):
         """ Конструктор класса explode
         Args:
-        rect.x - начальное положение цели по горизонтали
-        rect.y - начальное положение цели по вертикали
-        
+        image: type pygame.Surface - изображение взрыва
+        rect.x: type int - начальное положение по горизонтали
+        rect.y: type int - начальное положение по вертикали
+        speedy: type int- скорость по y
+        speedx: type int -скорость по x
+        k: type int- диаметр
+        t: type int- время существования
+        tx: type int - время, до которого увеличивается
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
