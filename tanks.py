@@ -21,19 +21,36 @@ font = pygame.font.Font(None, 25)
 
 class Tank2(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Tank2
-        Args:
-        image: type pygame.Surface - изображение танка
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        rect.centerx - начальное положение центра игрока  по горизонтали
-        rect.bottom - начальное положение нижней грани игрока по вертикали
-        health: type int - здоровье
-        f: type int-интервал времени, с которомы стреляет вражеский танк
-        u: type int - скорость вылета снаряда вдоль осей
-        bn: type float- угол выстрела (45)
-        r: type float- радиус зоны обстрела
-        to: type int- время, до которого танк отъезжает(60 - время движения)
+        """ 
+        Конструктор класса Tank2
+        
+        Parameters
+        ----------
+        image: type pygame.Surface
+            изображение танка
+        speedy: type int
+            скорость по y
+        speedx: type int 
+            скорость по x
+        rect.centerx 
+            начальное положение центра игрока  по горизонтали
+        rect.bottom 
+            начальное положение нижней грани игрока по вертикали
+        health: type int 
+            здоровье
+        f: type int
+            интервал времени, с которомы стреляет вражеский танк
+        u: type int
+            скорость вылета снаряда вдоль осей
+        bn: type float
+            угол выстрела (45)
+        r: type float
+            радиус зоны обстрела
+        to: type int
+            время, до которого танк отъезжает(60 - время движения)
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
@@ -83,15 +100,28 @@ class Tank2(pygame.sprite.Sprite):
             return True
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Enemy
-        Args:
-        image: type pygame.Surface -изображение снаряда
-        rect.x: type int - начальное положение Enemy по горизонтали
-        rect.y: type int - начальное положение Enemy по вертикали
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        points: type int-очки, которые снимаются при попадании в игрока
-        r: type float- радиус
+        """ 
+        Конструктор класса Enemy
+        
+        Parameters
+        ----------
+        image: type pygame.Surface
+            изображение снаряда
+        rect.x: type int 
+            начальное положение Enemy по горизонтали
+        rect.y: type int 
+            начальное положение Enemy по вертикали
+        speedy: type int
+            скорость по y
+        speedx: type int 
+            скорость по x
+        points: type int
+            очки, которые снимаются при попадании в игрока
+        r: type float    
+            радиус
+            
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -110,7 +140,13 @@ class Enemy(pygame.sprite.Sprite):
         """"
         Функция задает начальные координаты и скорости снаряду
         Определяется положением танка
+        
+        Parameters
+        ----------
         obj:type  __main__.Tank2
+        
+        Returns None.
+        -------
         """
         self.rect.x = obj.rect.x
         self.rect.y = obj.rect.y
@@ -129,8 +165,16 @@ class Enemy(pygame.sprite.Sprite):
             self.speedy=-self.speedy
         
     def hit0(self,obj):
-        """Попадание  в врага. Снижает его здоровье
-        obj: type __main__.Player"""
+        """
+        Попадание  в врага. Снижает его здоровье
+        
+        Parameters
+        ----------
+        obj: type __main__.Player
+        
+        Returns None.
+        -------
+        """
         global  text0, text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.rect.x = WIDTH+100
@@ -144,7 +188,14 @@ class Enemy(pygame.sprite.Sprite):
             
     def hit1(self,obj):
         """Попадание  в снаряд врага. Удаляет оба объекта
-        obj: type __main__.Targ1"""
+        
+        Parameters
+        ----------
+        obj: type __main__.Targ1
+        
+        Returns None.
+        -------
+        """
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             self.kill()
             obj.kill()
@@ -155,26 +206,50 @@ class Enemy(pygame.sprite.Sprite):
       
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Player
-        Args:
-        image: type pygame.Surface - изображение игрока
-        score: type int -  счет
-        time: type int - счетчик времени
-        speedx: type int -скорость по x
-        rect.centerx: type int - начальное положение центра игрока  по горизонтали
-        rect.bottom: type int - начальное положение нижней грани игрока по вертикали
-        f2_power: type int - сила выстрела.Определяет скорость снаряда
-        f2_on: type int - 0 None 1 режим стрельбы
-        bn: type float - угол прицеливания
-        r: type float - радиус зоны контакта
-        health: type int-здоровье.При 0 проигрыш
-        color: type tuple-цвет ствола
-        L: type float-длина ствола по оси x
-        xo: type float-конец ствола по оси x
-        yo: type float-конец ствола по оси y
-        a: type int-сдвиг ствола относительно центра танка по оси x
-        b: type int-конец ствола относительно центра танка по оси y
-        H: type int-толщина ствола
+        """ 
+        Конструктор класса Player
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение игрока
+        score: type int
+            счет
+        time: type int 
+            счетчик времени
+        speedx: type int
+            скорость по x
+        rect.centerx: type int
+            начальное положение центра игрока  по горизонтали
+        rect.bottom: type int 
+            начальное положение нижней грани игрока по вертикали
+        f2_power: type int
+            сила выстрела.Определяет скорость снаряда
+        f2_on: type int 
+            0 None 1 режим стрельбы
+        bn: type float 
+            угол прицеливания
+        r: type float
+            радиус зоны контакта
+        health: type int
+            здоровье.При 0 проигрыш
+        color: type tuple
+            цвет ствола
+        L: type float
+            длина ствола по оси x
+        xo: type float
+            конец ствола по оси x
+        yo: type float
+            конец ствола по оси y
+        a: type int    
+            сдвиг ствола относительно центра танка по оси x
+        b: type int
+            конец ствола относительно центра танка по оси y
+        H: type int
+            толщина ствола
+            
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
@@ -250,7 +325,14 @@ class Player(pygame.sprite.Sprite):
     def targetting(self, x1,y1):
         """Прицеливание.Расчитывает угол, под которым целится игрок. 
         Зависит от положения мыши и танком
-        x1,y1: type tuple-позиция мыши
+        
+        Parameters
+        ----------
+        x1,y1: type tuple
+            позиция мыши
+        
+        Returns None.
+        -------
         """
         if (x1-self.rect.centerx)>0  :
                 self.bn = math.atan((-y1+self.rect.centery) / (x1-self.rect.centerx)) 
@@ -287,28 +369,51 @@ class Player(pygame.sprite.Sprite):
                              -self.b+self.rect.centery-self.H*math.cos(self.bn))],1)
     def check(self,obj): 
         """
-        obj: type __main__.Tank2
         Функция проверяет расстояние между игроком и врагом
-        Если игрок слишком близко, отталкивает его назад"""
+        Если игрок слишком близко, отталкивает его назад
+        
+        Parameters
+        ----------
+        obj: type __main__.Tank2
+        
+        Returns None.
+        -------
+        """
         if obj.rect.left-self.rect.right<=10:
             self.rect.right-=10
     def fin2(self):
-        """Окончание игры, если проиграли.Проверяет здоровье игрока
-        Возвращает True при выполнении условия"""
+        """
+        Окончание игры, если проиграли.Проверяет здоровье игрока
+        
+        Returns True
+        """
         if self.health<=0:
             return True
         
 class Shells(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Shells
-        Args:
-        image: type pygame.Surface - изображение снаряда
-        rect.x - начальное положение снаряда по горизонтали
-        rect.y - начальное положение снаряда по вертикали
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        r: type float- радиус
-        points: type int- количество очков, получаемое при попадании в цель
+        """ 
+        Конструктор класса Shells
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение снаряда
+        rect.x: type int 
+            начальное положение снаряда по горизонтали
+        rect.y: type int 
+            начальное положение снаряда по вертикали
+        speedy: type int
+            скорость по y
+        speedx: type int
+            скорость по x
+        r: type float
+            радиус
+        points: type int
+            количество очков, получаемое при попадании в цель
+            
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -339,7 +444,13 @@ class Shells(pygame.sprite.Sprite):
         """Попадание  в цель. Добавляются очки, удаляется цель, создается новая
         Прибавяется points к счету
         Обновляются значения text0 и text01
+        
+        Parameters
+        ----------
         obj: type __main__.Targ1
+        
+        Returns None.
+        -------
         """
         global  text0,text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
@@ -359,7 +470,13 @@ class Shells(pygame.sprite.Sprite):
         Прибавяется points к счету
         Обновляются значения text0 и text01
         Удаляется снаряд, уменьшается здоровье врага
+        
+        Parameters
+        ----------
         obj: type __main__.Tank2
+        
+        Returns None.
+        -------
         """
         global  text0,text01
         if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
@@ -371,14 +488,26 @@ class Shells(pygame.sprite.Sprite):
     
 class Targ1(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса Targ1
-        Args:
-        image: type pygame.Surface - изображение цели
-        rect.x: type int - начальное положение цели по горизонтали
-        rect.y: type int - начальное положение цели по вертикали
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        r: type float- радиус
+        """ 
+        Конструктор класса Targ1
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение цели
+        rect.x: type int
+            начальное положение цели по горизонтали
+        rect.y: type int 
+            начальное положение цели по вертикали
+        speedy: type int
+            скорость по y
+        speedx: type int
+            скорость по x
+        r: type float
+            радиус
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -402,13 +531,24 @@ class Targ1(pygame.sprite.Sprite):
             self.speedy = randint(1, 8)      
 class Exit():
     def __init__(self):
-        """ Конструктор класса Exit
-        Args:
+        """ 
+        Конструктор класса Exit
         
-        b: type int - высота таблички выхода
-        а: type int - ширина таблички выхода
-        с: type int- принимает значение 0 в течение всей игры, пока игрок не попадет на выход.
-        Используется для остановки спрайтов в последующий момент"""
+        Parameters
+        ----------
+        
+        b: type int 
+            высота таблички выхода
+        а: type int 
+            ширина таблички выхода
+        с: type int
+            принимает значение 0 в течение всей игры,
+            пока игрок не попадет на выход.
+            Используется для остановки спрайтов в последующий момент
+        
+        Returns None.
+        -------
+        """
         self.b=100
         self.a=150
         self.c=0
@@ -453,16 +593,30 @@ class Exit():
             return  True              
 class Explode(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса explode
-        Args:
-        image: type pygame.Surface - изображение взрыва
-        rect.x: type int - начальное положение по горизонтали
-        rect.y: type int - начальное положение по вертикали
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        k: type int- диаметр
-        t: type int- время существования
-        tx: type int - время, до которого увеличивается
+        """ 
+        Конструктор класса explode
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение взрыва
+        rect.x: type int
+            начальное положение по горизонтали
+        rect.y: type int 
+            начальное положение по вертикали
+        speedy: type int
+            скорость по y
+        speedx: type int 
+            скорость по x
+        k: type int
+            диаметр
+        t: type int
+            время существования
+        tx: type int
+            время, до которого увеличивается радиус
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
@@ -490,16 +644,29 @@ class Explode(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
 class Expl2(pygame.sprite.Sprite):
     def __init__(self):
-        """ Конструктор класса explode
-        Args:
-        image: type pygame.Surface - изображение взрыва
-        rect.x: type int - начальное положение по горизонтали
-        rect.y: type int - начальное положение по вертикали
-        speedy: type int- скорость по y
-        speedx: type int -скорость по x
-        k: type int- диаметр
-        t: type int- время существования
-        tx: type int - время, до которого увеличивается
+        """ Конструктор класса Expl2
+        
+        Parameters
+        ----------
+        image: type pygame.Surface 
+            изображение взрыва
+        rect.x: type int
+            начальное положение по горизонтали
+        rect.y: type int 
+            начальное положение по вертикали
+        speedy: type int
+            скорость по y
+        speedx: type int 
+            скорость по x
+        k: type int
+            диаметр
+        t: type int
+            время существования
+        tx: type int
+            время, до которого увеличивается радиус
+        
+        Returns None.
+        -------
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
