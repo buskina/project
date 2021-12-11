@@ -233,8 +233,11 @@ class Exit():
         
 
 def init():
+    """
+    Функция задающая значения основным переменным
+    """
     global finished
-    
+    # Переменная, отвечающая за начало общего цикла игры.
     finished = False
     
 def mainFire(screen, clock):
@@ -305,10 +308,7 @@ text2 = font.render("YOU LOSED",True,DPURPLE)
 text4 = font.render("EXIT",True,DPURPLE)
 
 
-# Переменная, отвечающая за начало общего цикла игры.
-
 # Запуск цикла игры
-
     
 if __name__ == '__main__':
     pygame.init()
@@ -317,5 +317,4 @@ if __name__ == '__main__':
     mainFire(screen,clock)          
     
     
-
-#pygame.quit()
+pygame.quit()
