@@ -39,27 +39,27 @@ img_dir = path.join(path.dirname(__file__), 'img2')
 book1 = pygame.image.load(path.join(img_dir, 'book1.png')).convert()
 book1 = pygame.transform.scale(book1, (CELLSIZE, CELLSIZE))
 
-book2 = pygame.image.load(path.join(img_dir, 'book2.jpg')).convert()
+book2 = pygame.image.load(path.join(img_dir, 'book2.png')).convert()
 book2 = pygame.transform.scale(book2, (CELLSIZE, CELLSIZE))
 
 closed = pygame.image.load(path.join(img_dir, 'closed.png')).convert()
 
-comp = pygame.image.load(path.join(img_dir, 'comp.jpg')).convert()
+comp = pygame.image.load(path.join(img_dir, 'comp.png')).convert()
 comp = pygame.transform.scale(comp, (CELLSIZE, CELLSIZE))
 
 empty = pygame.image.load(path.join(img_dir, 'empty.jpg')).convert()
 empty = pygame.transform.scale(empty, (CELLSIZE, CELLSIZE))
 
-energy = pygame.image.load(path.join(img_dir, 'energy.jpg')).convert()
+energy = pygame.image.load(path.join(img_dir, 'energy.png')).convert()
 energy = pygame.transform.scale(energy, (CELLSIZE, CELLSIZE))
 
-energy2 = pygame.image.load(path.join(img_dir, 'energy2.jpg')).convert()
+energy2 = pygame.image.load(path.join(img_dir, 'energy2.png')).convert()
 energy2 = pygame.transform.scale(energy2, (CELLSIZE, CELLSIZE))
 
 heart = pygame.image.load(path.join(img_dir, 'heart.png')).convert()
 heart = pygame.transform.scale(heart, (CELLSIZE, CELLSIZE))
 
-money = pygame.image.load(path.join(img_dir, 'money.jpg')).convert()
+money = pygame.image.load(path.join(img_dir, 'money.png')).convert()
 money = pygame.transform.scale(money, (CELLSIZE, CELLSIZE))
 
 
