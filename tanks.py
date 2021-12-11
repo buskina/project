@@ -691,6 +691,86 @@ class Expl2(pygame.sprite.Sprite):
             self.k-=1
         self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
         self.image.set_colorkey(BLACK)
+
+def init():
+    """
+    Функция задающая значения основным переменным
+    """
+    global finished
+    # Переменная, отвечающая за начало общего цикла игры.
+    finished = False 
+    tank2=Tank2()
+    
+    
+def maintank(screen, clock):
+    """
+    Функция запускает основной цикл программы
+    """
+    global finished,tank2,enemy
+    init()
+    while not finished:
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)#отрисовка фона
+        screen.blit(text0, [40,100])#выводит счет
+    
+        if tank2 in all_sprites:#если уже создан враг
+        #отрисовывает его, расчитывает необходимую скорость снаряда
+            tank2.drawl()
+            player1.check(tank2)
+            tank2.theory(player1)
+            if (player1.time % tank2.f)==0:#стреляет в игрока с периодом f
+                enemy= Enemy()
+                all_sprites.add(enemy)
+                enemy.start(tank2)
+            if tank2.fin1():#выигрыш
+                exit0.end1()
+            if player1.fin2():#проигрыш
+                exit0.end2()
+            enemy.hit0(player1)#попадание в игрока
+            for s in shells:
+                enemy.hit1(s)#попадание в cнаряд врага
+        for p in players:
+            p.gun() #отрисовка ствола танка
+        all_sprites.draw(screen)
+        player1.drawl()#отрисовка здоровья игрока
+    
+        if player1.time==player1.tx:#Замена друга на врага в tx
+            player2.kill()
+            tank2=Tank2()
+            all_sprites.add(tank2)
+    
+        for s in shells:
+            if tank2 in all_sprites:
+                s.hit0(tank2)#попадание в танк врага
+            for t in targets:
+                s.hit(t)#попадание в цель
+        pygame.display.update()
+
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:#выход через программу
+                finished = True
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE:#выход через ESCAPE
+                    finished = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if exit0.hitexit() and exit0.c==1:#выход при нажатии кнопки в игре
+                    finished = True
+                for p in players:
+                    p.fire2_start()#начало выстрела игрока при нажатии мыши
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                for p in players:
+                    p.fire2_end()#конец выстрела игрока при отпускании мыши
+            elif event.type == pygame.MOUSEMOTION:
+                x1,y1=pygame.mouse.get_pos()
+                for p in players:    
+                    p.targetting(x1,y1)#прицеливание при удержании мыши
+        for p in players:
+            p.power_up()#разряжает оружие
+        if exit0.c==0:
+        # Обновляем координаты всех объектов если игра не закончена
+            all_sprites.update()
 pygame.init()
 #задаем папку, где хранятся изображения и фон  
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -734,70 +814,12 @@ text4 = font.render("EXIT",True,ORANGE)
 # Переменная, отвечающая за начало общего цикла игры.
 finished = False
 # Запуск цикла игры
-while not finished:
-    
-    screen.fill(BLACK)
-    screen.blit(background, background_rect)#отрисовка фона
-    screen.blit(text0, [40,100])#выводит счет
-    
-    if tank2 in all_sprites:#если уже создан враг
-    #отрисовывает его, расчитывает необходимую скорость снаряда
-        tank2.drawl()
-        player1.check(tank2)
-        tank2.theory(player1)
-        if (player1.time % tank2.f)==0:#стреляет в игрока с периодом f
-            enemy= Enemy()
-            all_sprites.add(enemy)
-            enemy.start(tank2)
-            
-        if tank2.fin1():#выигрыш
-            exit0.end1()
-        if player1.fin2():#проигрыш
-            exit0.end2()
-        enemy.hit0(player1)#попадание в игрока
-        for s in shells:
-            enemy.hit1(s)#попадание в cнаряд врага
-    for p in players:
-        p.gun() #отрисовка ствола танка
-    all_sprites.draw(screen)
-    player1.drawl()#отрисовка здоровья игрока
-    
-    if player1.time==player1.tx:#Замена друга на врага в tx
-        player2.kill()
-        tank2=Tank2()
-        all_sprites.add(tank2)
-    
-    for s in shells:
-        if tank2 in all_sprites:
-            s.hit0(tank2)#попадание в танк врага
-        for t in targets:
-            s.hit(t)#попадание в цель
-    pygame.display.update()
 
-    clock.tick(FPS)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:#выход через программу
-            finished = True
-        if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
-                finished = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if exit0.hitexit() and exit0.c==1:#выход при нажатии кнопки в игре
-                finished = True
-            for p in players:
-                p.fire2_start()#начало выстрела игрока при нажатии мыши
 
-        elif event.type == pygame.MOUSEBUTTONUP:
-            for p in players:
-                p.fire2_end()#конец выстрела игрока при отпускании мыши
-        elif event.type == pygame.MOUSEMOTION:
-                x1,y1=pygame.mouse.get_pos()
-                for p in players:    
-                    p.targetting(x1,y1)#прицеливание при удержании мыши
-    for p in players:
-        p.power_up()#разряжает оружие
-    if exit0.c==0:
-        # Обновляем координаты всех объектов если игра не закончена
-        all_sprites.update()
-
+if __name__ == '__main__':
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    clock = pygame.time.Clock()
+    maintank(screen,clock) 
+    
 pygame.quit()
