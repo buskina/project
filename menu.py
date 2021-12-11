@@ -3,6 +3,7 @@ from random import *
 import numpy as np
 from os import path
 from Treasure import game_1
+from Tricky_clicker import game_2
 
 WIDTH = 800
 HEIGHT = 600
@@ -49,7 +50,7 @@ class Button():
     def hitbutton(self):
         """Попадание  в кнопку. Осуществляется действие"""
         x1,y1=pygame.mouse.get_pos()
-        if self.x<=x1 and x1<=self.x+2*self.dx and self.y<=y1 and y1<=self.y+2*self.dy:
+        if self.x<=x1 and x1<=self.x+self.dx and self.y<=y1 and y1<=self.y+self.dy:
             return  True
         else:
             return False
@@ -57,20 +58,31 @@ class Button():
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
-screen.fill(WHITE)
-b1 = Button(screen)
-b1.x = 10
-b1.y = 10
-b1.dx = 80
-b1.dy = 50
-b1.textx = 20
-b1.texty = 20
-b1.borderwidth = 3
-b1.text = "LEVEL 1"
-b1.draw()
-pygame.display.update()
+
 finished = False
 while not finished:
+    screen.fill(WHITE)
+    b1 = Button(screen)
+    b1.x = 10
+    b1.y = 10
+    b1.dx = 100
+    b1.dy = 50
+    b1.textx = 20
+    b1.texty = 20
+    b1.borderwidth = 3
+    b1.text = "LEVEL 1"
+    b1.draw()
+    b2 = Button(screen)
+    b2.x = 120
+    b2.y = 10
+    b2.dx = 100
+    b2.dy = 50
+    b2.textx = 130
+    b2.texty = 20
+    b2.borderwidth = 3
+    b2.text = "LEVEL 2"
+    b2.draw()
+    pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -78,5 +90,6 @@ while not finished:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if b1.hitbutton():
                 game_1(screen, clock)
-                # finished = True
+            if b2.hitbutton():
+                game_2(screen, clock)
 pygame.quit()
