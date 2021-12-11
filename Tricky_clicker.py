@@ -1,11 +1,10 @@
 import pygame
 from random import *
-
+from os import path
+import random as rd
 
 WIDTH = 800
 HEIGHT = 600
-CELLNUM = 10
-CELLSIZE = HEIGHT//CELLNUM
 FPS = 30
 
 # Задание цветов
@@ -21,117 +20,200 @@ BLUE = (0, 0, 255)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
-screen.fill(WHITE)
+screen.fill(BLACK)
+
+
+# Инициализация всех необходимых для игры объектов
+CELLNUM = 10
+CELLSIZE = HEIGHT//CELLNUM
+game_manager = {
+    'score': 0,
+    'time left': 120,
+    'freezing': 0,
+    'acceleration': 1
+}
+counter = 0
+
+
+img_dir = path.join(path.dirname(__file__), 'img2')
+book1 = pygame.image.load(path.join(img_dir, 'book1.png')).convert()
+book1 = pygame.transform.scale(book1, (CELLSIZE, CELLSIZE))
+
+book2 = pygame.image.load(path.join(img_dir, 'book2.jpg')).convert()
+book2 = pygame.transform.scale(book2, (CELLSIZE, CELLSIZE))
+
+closed = pygame.image.load(path.join(img_dir, 'closed.png')).convert()
+
+comp = pygame.image.load(path.join(img_dir, 'comp.jpg')).convert()
+comp = pygame.transform.scale(comp, (CELLSIZE, CELLSIZE))
+
+empty = pygame.image.load(path.join(img_dir, 'empty.jpg')).convert()
+empty = pygame.transform.scale(empty, (CELLSIZE, CELLSIZE))
+
+energy = pygame.image.load(path.join(img_dir, 'energy.jpg')).convert()
+energy = pygame.transform.scale(energy, (CELLSIZE, CELLSIZE))
+
+energy2 = pygame.image.load(path.join(img_dir, 'energy2.jpg')).convert()
+energy2 = pygame.transform.scale(energy2, (CELLSIZE, CELLSIZE))
+
+heart = pygame.image.load(path.join(img_dir, 'heart.png')).convert()
+heart = pygame.transform.scale(heart, (CELLSIZE, CELLSIZE))
+
+money = pygame.image.load(path.join(img_dir, 'money.jpg')).convert()
+money = pygame.transform.scale(money, (CELLSIZE, CELLSIZE))
+
 
 class Cell:
     def __init__(self, screen: pygame.Surface):
-         """ Конструктор класса Cell
+        """ Конструктор класса Cell
 
-         Args:
-         x - положение центра ячейки по горизонтали
-         y - положение центра ячейки по вертикали
-         type - параметр наполнения ячейки (0 - закрыта, 1 - пустая, 2 - обычная, 
-         3 - обнуляет все очки, 4 - замораживает время, 5 - добавляет много очков, но ускоряет счетчик
-         времени)
-         time - время до закрытия ячейки
-         chosen - в ячейку предлагается поместить новый объект
-         """
-         self.screen = screen
-         self.x = 0
-         self.y = 0
-         self.type = 0 
-         self.time = 0
-         self.chosen = 0
+        Args:
+        x - положение ячейки по горизонтали
+        y - положение ячейки по вертикали
+        type - параметр наполнения ячейки (0 - закрыта, 1 - пустая, 2 - обычная, 
+        3 - обнуляет все очки, 4 - замораживает время, 5 - добавляет много очков, но ускоряет счетчик
+        времени)
+        time - время до закрытия ячейки
+        chosen - в ячейку предлагается поместить новый объект
+        """
+        self.screen = screen
+        self.x = 0
+        self.y = 0
+        self.type = 0
+        self.time = 0
+        self.im = pygame.Surface((CELLSIZE, CELLSIZE))
+        self.im = closed
+        self.im = pygame.transform.scale(closed, (CELLSIZE, CELLSIZE))
 
     def draw(self):
         """
         Отрисовывает ячейку
         """
-        if self.type!=0:
-            if self.type==2:
-                pygame.draw.rect(self.screen, 
-                GREEN, (self.x*CELLSIZE, self.y*CELLSIZE, 
-                CELLSIZE, CELLSIZE))
-            elif self.type==3:
-                pygame.draw.rect(self.screen, 
-                BLUE, (self.x*CELLSIZE, self.y*CELLSIZE, 
-                CELLSIZE, CELLSIZE))
-            elif self.type==4:
-                pygame.draw.rect(self.screen, 
-                YELLOW, (self.x*CELLSIZE, self.y*CELLSIZE, 
-                CELLSIZE, CELLSIZE))
-            elif self.type==5:
-                pygame.draw.rect(self.screen, 
-                MAGENTA, (self.x*CELLSIZE, self.y*CELLSIZE, 
-                CELLSIZE, CELLSIZE))
-            else:
-                pygame.draw.rect(self.screen, 
-                RED, (self.x*CELLSIZE, self.y*CELLSIZE, 
-                CELLSIZE, CELLSIZE))
-        else:
-            pygame.draw.rect(self.screen, 
-            BLACK, (self.x*CELLSIZE, self.y*CELLSIZE, 
-            CELLSIZE, CELLSIZE))
-    
+        self.im_rect = self.im.get_rect(
+            topleft=(self.x*CELLSIZE, self.y*CELLSIZE))
+        screen.blit(self.im, self.im_rect)
+
     def clicktest(self, event):
         """
         Проверяем, попал ли пользователь в ячейку
         """
-        if (event.pos[0]<=(self.x+1)*CELLSIZE and event.pos[0]>=(self.x)*CELLSIZE and
-            event.pos[1]<=(self.y+1)*CELLSIZE and event.pos[1]>=self.y*CELLSIZE and self.type!=0):
-            return True
-        else: 
-            return False
-      
-    def move(self,field):
+        return (event.pos[0] <= (self.x+1)*CELLSIZE and event.pos[0] >= (self.x)*CELLSIZE and
+                event.pos[1] <= (self.y+1)*CELLSIZE and event.pos[1] >= self.y*CELLSIZE and self.type != 0)
+
+    def move(self, field):
         """
         Функция движения ячейки. Если она открыта, время уменьшается на 1. Если она выбрана под 
         заполнение, меняем тип и время открытия на случайные. Если ячейка закрыта, ничего не происходит.
         """
-        if self.chosen:
-            self.type = randint(1,5)
-            self.time = randint(30,60)
-            self.chosen = 0
-
-        if self.time>0:
-            self.time-=1
+        if self.time > 0:
+            self.time -= 1
         elif self.type != 0:
-            self.time=0
-            self.type=0
-            chosen = 0
+            field[self.x][self.y] = Cell(screen)
+            field[self.x][self.y].x = self.x
+            field[self.x][self.y].y = self.y
+
+            chosen = False
             while not chosen:
-                x = randint(0,CELLNUM-1)
-                y = randint(0,CELLNUM-1)
+                x = randint(0, CELLNUM-1)
+                y = randint(0, CELLNUM-1)
                 if field[x][y].type == 0:
-                    field[x][y].chosen = True
+                    field[x][y] = rd.choice(
+                        [Tricky(), Timer(), Zeroer(), Ordinary(), Empty()])
+                    field[x][y].x = x
+                    field[x][y].y = y
                     chosen = True
+
+
+class Empty(Cell):
+    def __init__(self):
+        """Инициализация дочернего класса"""
+        Cell.__init__(self, screen)
+        self.type = 1
+        self.time = randint(30, 60)
+        self.im = empty
+
+    def effect(self):
+        game_manager['score'] -= 1
+
+
+class Ordinary(Cell):
+    def __init__(self):
+        """Инициализация дочернего класса"""
+        Cell.__init__(self, screen)
+        self.type = 2
+        self.time = randint(30, 60)
+        self.im = rd.choice([book1, book2, comp])
+
+    def effect(self):
+        game_manager['score'] += 3
+
+
+class Zeroer(Cell):
+    def __init__(self):
+        """Инициализация дочернего класса"""
+        Cell.__init__(self, screen)
+        self.type = 3
+        self.time = randint(30, 60)
+        self.im = heart
+
+    def effect(self):
+        game_manager['score'] = 0
+
+
+class Timer(Cell):
+    def __init__(self):
+        """Инициализация дочернего класса"""
+        Cell.__init__(self, screen)
+        self.type = 4
+        self.time = randint(30, 60)
+        self.im = rd.choice([energy, energy2])
+
+    def effect(self):
+        game_manager['freezing'] += 3
+
+
+class Tricky(Cell):
+    def __init__(self):
+        """Инициализация дочернего класса"""
+        Cell.__init__(self, screen)
+        self.type = 5
+        self.time = randint(30, 60)
+        self.im = money
+
+    def effect(self):
+        game_manager['score'] += 5
+        game_manager['acceleration'] += 0.2
+
 
 def fielding(number_of_cells):
     """
     Функция заполняет поле объектами типа Cell
     """
-    field=[]
+    field = []
     for i in range(number_of_cells):
-        line=[]
+        line = []
         for j in range(number_of_cells):
             line.append(Cell(screen))
         field.append(line)
     return field
+
 
 def planting(field, number_of_cells):
     """
     Функция меняет параметры каждой клетки
     """
     for i in range(8):
-        x = randint(0,5)
-        y = randint(0,5)
-        field[x][y].chosen = 1
+        x = randint(0, CELLNUM - 1)
+        y = randint(0, CELLNUM - 1)
+        field[x][y] = rd.choice(
+            [Tricky(), Timer(), Zeroer(), Ordinary(), Empty()])
     for i in range(number_of_cells):
         for j in range(number_of_cells):
             field[i][j].x = i
             field[i][j].y = j
             field[i][j].move(field)
             field[i][j].draw()
+
 
 def action(field, number_of_cells):
     """
@@ -140,6 +222,7 @@ def action(field, number_of_cells):
     for i in range(number_of_cells):
         for j in range(number_of_cells):
             field[i][j].move(field)
+
 
 def draw(field, number_of_cells):
     """
@@ -150,66 +233,64 @@ def draw(field, number_of_cells):
             field[i][j].draw()
 
 
-def testing(field, number_of_cells, event, Game_manager):
+def testing(field, number_of_cells, event, game_manager):
     """
     Функция проверки попадания в ячейку для каждой ячейки поля
     """
-    for i in range(number_of_cells):
-        for j in range(number_of_cells):
-            if field[i][j].clicktest(event):
-                if field[i][j].type==1:
-                    Game_manager[0]-=1
-                elif field[i][j].type==3:
-                    Game_manager[0] = 0
-                elif field[i][j].type==2:
-                    Game_manager[0]+=3
-                elif field[i][j].type==5:
-                    Game_manager[0]+=5
-                    Game_manager[3]+=0.2
-                if field[i][j].type==4:
-                    Game_manager[2]+=3
-                field[i][j].type=0
-                field[i][j].time=0
-                field[i][j].chosen=0
-                chosen = False
-                while not chosen:
-                    x = randint(0,CELLNUM-1)
-                    y = randint(0,CELLNUM-1)
-                    if field[x][y].type==0:
-                        field[x][y].chosen = True
-                        chosen = True
+
+    x = event.pos[0] // CELLSIZE
+    y = event.pos[1] // CELLSIZE
+
+    if not (0 <= x < number_of_cells):
+        return 
+    if not (0 <= y < number_of_cells):
+        return
+    if field[x][y].type == 0:
+        return 
 
 
-# Инициализация всех необходимых для игры объектов
-field=fielding(CELLNUM)
+    field[x][y].effect()
+    field[x][y] = Cell(screen)
+    field[x][y].x = x
+    field[x][y].y = y
+
+    chosen = False
+    while not chosen:
+        x = randint(0, CELLNUM - 1)
+        y = randint(0, CELLNUM - 1)
+        if field[x][y].type == 0:
+            field[x][y] = rd.choice([Tricky(), Timer(), Zeroer(), Ordinary(), Empty()])
+            field[x][y].x = x
+            field[x][y].y = y
+            chosen = True
+
+field = fielding(CELLNUM)
 planting(field, CELLNUM)
-Game_manager = [0, 0, 0, 1]
-Game_manager[1] = 15
-counter = 0
+font = pygame.font.Font(None, 36)
+
 
 not_finished = True
 while not_finished:
     # Работа счетчика времени
-    counter+=1
-    min = Game_manager[1]//60
-    sec = Game_manager[1] - 60*min
+    counter += 1
+    min = game_manager['time left']//60
+    sec = game_manager['time left'] - 60*min
     timevalue = '{:02d}:{:02d}'.format(min, sec)
-    if counter>FPS/Game_manager[3]:
+    if counter > FPS/game_manager['acceleration']:
         counter = 0
-        if Game_manager[2]>0:
-            Game_manager[2]-=1
+        if game_manager['freezing'] > 0:
+            game_manager['freezing'] -= 1
         else:
-            Game_manager[1] -=1
+            game_manager['time left'] -= 1
 
     # Отрисовка всего
-    screen.fill(WHITE)
+    screen.fill(BLACK)
     action(field, CELLNUM)
     draw(field, CELLNUM)
-    font=pygame.font.Font(None, 36)
-    scorevalue="score = "+str(Game_manager[0])
-    scoreboard=font.render(scorevalue, True, BLACK)
+    scorevalue = "score = "+str(game_manager['score'])
+    scoreboard = font.render(scorevalue, True, WHITE)
     screen.blit(scoreboard, (650, 50))
-    timeboard=font.render(timevalue, True, BLACK)
+    timeboard = font.render(timevalue, True, WHITE)
     screen.blit(timeboard, (650, 100))
     pygame.display.update()
     clock.tick(FPS)
@@ -219,19 +300,19 @@ while not_finished:
         if event.type == pygame.QUIT:
             not_finished = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            testing(field, CELLNUM, event, Game_manager)
+            testing(field, CELLNUM, event, game_manager)
             action(field, CELLNUM)
-            pygame.display.update()       
-    
+            pygame.display.update()
+
     # Выход из игры по окончании установленного времени
-    if Game_manager[1]<0:
+    if game_manager['time left'] < 0:
         screen.fill(BLACK)
-        font=pygame.font.Font(None, 72)
-        scorevalue="Game Over"
-        scoreboard=font.render(scorevalue, True, GREEN)
+        font = pygame.font.Font(None, 72)
+        scorevalue = "Game Over"
+        scoreboard = font.render(scorevalue, True, GREEN)
         screen.blit(scoreboard, (250, 250))
         not_finished = False
         pygame.display.update()
         pygame.time.delay(500)
-    
+
 pygame.quit()

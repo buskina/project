@@ -100,7 +100,7 @@ def finishing(scorevalue, screen):
 def init():
     global counter, secs, scorevalue
     counter = 0
-    secs = 30
+    secs = 10
     scorevalue = ""
 
 # Вот так нужно засунуть основной цикл в функцию
@@ -115,8 +115,6 @@ def game_1(screen, clock):
         background_creator(screen)
         clock.tick(FPS)
         time_manager(secs, screen)
-        if secs < 0:
-            break
         # Обработка событий игры
         for event in pygame.event.get():
             processing(event, layer, screen)
