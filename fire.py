@@ -227,7 +227,41 @@ class Exit():
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True  
-    
+def mainFire():
+    global finished, all_sprites
+    while not finished:    
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)# рисуем фон
+        screen.blit(text0, [40,100])
+        all_sprites.draw(screen)
+        #выигрыш при нужном числе очков огня
+        if fire.points==fire.pointmax:
+            exit1.end1()
+            #проигрыш, если время истекло
+        elif fire.time<=0:
+            exit1.end2()
+        pygame.display.update()
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:#выход через программу
+                finished = True
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE:#выход через ESCAPE
+                    finished = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
+                    finished = True
+                x1,y1=pygame.mouse.get_pos()
+                for t in targets:
+                    t.hit(x1,y1)#проверка нажатия на цели
+            elif event.type == pygame.MOUSEMOTION:
+                if exit1.c==0:
+                    x1,y1=pygame.mouse.get_pos()
+                    fire.hit(x1,y1)#проверка контакта с огнем
+        if exit1.c==0:
+        #обновление всех спрайтов если игра не окончена
+            all_sprites.update()
+        
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 #задаем папку, где хранятся изображения и фон 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -260,38 +294,7 @@ clock = pygame.time.Clock()
 # Переменная, отвечающая за начало общего цикла игры.
 finished = False
 # Запуск цикла игры
-while not finished:    
-    screen.fill(BLACK)
-    screen.blit(background, background_rect)# рисуем фон
-    screen.blit(text0, [40,100])
-    all_sprites.draw(screen)
-    #выигрыш при нужном числе очков огня
-    if fire.points==fire.pointmax:
-        exit1.end1()
-    #проигрыш, если время истекло
-    elif fire.time<=0:
-        exit1.end2()
-    pygame.display.update()
-    clock.tick(FPS)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:#выход через программу
-            finished = True
-        if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
-                finished = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
-                finished = True
-            x1,y1=pygame.mouse.get_pos()
-            for t in targets:
-                t.hit(x1,y1)#проверка нажатия на цели
-        elif event.type == pygame.MOUSEMOTION:
-            if exit1.c==0:
-                x1,y1=pygame.mouse.get_pos()
-                fire.hit(x1,y1)#проверка контакта с огнем
-    if exit1.c==0:
-        #обновление всех спрайтов если игра не окончена
-        all_sprites.update() 
+mainFire()
     
           
     
