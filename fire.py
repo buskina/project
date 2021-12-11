@@ -64,7 +64,7 @@ class Fire(pygame.sprite.Sprite):
         self.points=0
         self.pointmax=10
         self.r=70
-        self.time=100
+        self.time=1000
      
     
     def update(self):
@@ -222,13 +222,27 @@ class Exit():
         screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def hitexit(self):
-        """Возвращает True при попадании  в кнопку выхода. 
-        Осуществляется выход из игры"""
+        """
+        Возвращает True при попадании  в кнопку выхода. 
+        Осуществляется выход из игры
+        """
         x1,y1=pygame.mouse.get_pos()
         if x1<WIDTH/2+self.a/2 and x1>WIDTH/2-self.a/2 and y1>HEIGHT/2+self.b/3 and y1<HEIGHT/2+2*self.b/3:
             return  True  
-def mainFire():
-    global finished, all_sprites
+        
+        
+
+def init():
+    global finished
+    
+    finished = False
+    
+def mainFire(screen, clock):
+    """
+    Функция запускает основной цикл программы
+    """
+    global finished
+    init()
     while not finished:    
         screen.fill(BLACK)
         screen.blit(background, background_rect)# рисуем фон
@@ -289,15 +303,19 @@ text01 = font.render("Score: 0",True,DPURPLE)
 text1 = font.render("YOU WIN!",True,DPURPLE)
 text2 = font.render("YOU LOSED",True,DPURPLE)
 text4 = font.render("EXIT",True,DPURPLE)
-clock = pygame.time.Clock()
+
 
 # Переменная, отвечающая за начало общего цикла игры.
-finished = False
+
 # Запуск цикла игры
-mainFire()
+
     
-          
+if __name__ == '__main__':
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    clock = pygame.time.Clock()
+    mainFire(screen,clock)          
     
     
 
-pygame.quit()
+#pygame.quit()
