@@ -1,5 +1,6 @@
 import pygame
 from random import *
+
 from os import path
 import random as rd
 
@@ -12,6 +13,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+
 YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
@@ -179,6 +181,7 @@ def fielding(number_of_cells, screen):
     return field
 
 
+
 def planting(screen, field, number_of_cells):
     """
     Функция меняет параметры каждой клетки
@@ -195,8 +198,8 @@ def planting(screen, field, number_of_cells):
             field[i][j].move(field)
             field[i][j].draw()
 
+def action(field, number_of_cells):
 
-def action(screen, field, number_of_cells):
     """
     Функция изменения всего поля за каждую единицу времени
     """
@@ -212,6 +215,7 @@ def draw(field, number_of_cells):
     for i in range(number_of_cells):
         for j in range(number_of_cells):
             field[i][j].draw()
+
 
 
 def testing(field, number_of_cells, event, game_manager, screen):
