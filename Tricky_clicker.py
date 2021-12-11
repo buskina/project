@@ -93,13 +93,6 @@ class Cell:
             topleft=(self.x*CELLSIZE, self.y*CELLSIZE))
         screen.blit(self.im, self.im_rect)
 
-    def clicktest(self, event):
-        """
-        Проверяем, попал ли пользователь в ячейку
-        """
-        return (event.pos[0] <= (self.x+1)*CELLSIZE and event.pos[0] >= (self.x)*CELLSIZE and
-                event.pos[1] <= (self.y+1)*CELLSIZE and event.pos[1] >= self.y*CELLSIZE and self.type != 0)
-
     def move(self, field):
         """
         Функция движения ячейки. Если она открыта, время уменьшается на 1. Если она выбрана под 
