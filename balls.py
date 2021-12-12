@@ -148,7 +148,7 @@ class Planets(pygame.sprite.Sprite):
         удаляется цель, создается новая
         """
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             obj.score += self.points
             obj.k=int((obj.k+self.k)/2)
             obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
@@ -283,8 +283,46 @@ class Exit(pygame.sprite.Sprite):
                 screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
                 self.c=1
                         
-
-               
+def init():
+    """
+    Функция задающая значения основным переменным
+    """
+    global finished
+    # Переменная, отвечающая за начало общего цикла игры.
+    finished = False 
+    
+def game_3(screen, clock):
+    """
+    Функция запускает основной цикл программы
+    """
+    global finished
+    init()  
+    # Запуск цикла игры
+    while not finished:
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)#отрисовка фона
+        all_sprites.draw(screen)#отрисовка всех спрайтов
+        exit1.hit(player)#проверяет попадание игрока в выход
+        screen.blit(text0, [40,100])#выводит счет
+        pygame.display.update()
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
+                    finished = True
+            if event.type == pygame.QUIT:#выход через программу
+                finished = True
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE:#выход через ESCAPE
+                    finished = True
+            for p in planets:
+                p.hit(player)# проверяет столкновение игрока с планетами
+                for i in planets:
+                    p.hitp(i)#проверяет столкновение планет между собой
+        
+        if exit1.c==0:
+        # Обновляем координаты всех объектов если игра не закончена
+            all_sprites.update()               
 #задаем папку, где хранятся изображения и фон          
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -318,36 +356,9 @@ text3 = font.render("Game over!",True,DPURPLE)
 text1 = font.render("Вы слишком маленький :(",True,DPURPLE)
 text2 = font.render("Вы слишком большой :)",True,DPURPLE)
 
-# Переменная, отвечающая за начало общего цикла игры.
-finished = False
-# Запуск цикла игры
-while not finished:
-    screen.fill(BLACK)
-    screen.blit(background, background_rect)#отрисовка фона
-    all_sprites.draw(screen)#отрисовка всех спрайтов
-    exit1.hit(player)#проверяет попадание игрока в выход
-    screen.blit(text0, [40,100])#выводит счет
-    pygame.display.update()
-    clock.tick(FPS)
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
-                finished = True
-        if event.type == pygame.QUIT:#выход через программу
-            finished = True
-        if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
-                finished = True
-    for p in planets:
-        p.hit(player)# проверяет столкновение игрока с планетами
-        for i in planets:
-            p.hitp(i)#проверяет столкновение планет между собой
-        
-    if exit1.c==0:
-        # Обновляем координаты всех объектов если игра не закончена
-        all_sprites.update()  
-       
-    
-    
-
+if __name__ == '__main__':
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    clock = pygame.time.Clock()
+    game_3(screen,clock) 
 pygame.quit()
