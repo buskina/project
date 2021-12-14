@@ -4,8 +4,12 @@ import pygame
 from pygame.draw import *
 from os import path
 
-pygame.init()
 img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
+
+pygame.init()
+
+
 FPS = 30
 #задаем цвета
 GREEN = (0, 255, 0)
@@ -271,7 +275,7 @@ class Player(pygame.sprite.Sprite):
         self.f2_power = 10
         self.f2_on = 0
         self.bn = 1
-        self.tx=100
+        self.tx=540
         self.health=100
         self.r=self.a/2
         self.color=DGREEN
@@ -768,6 +772,7 @@ def game_3(screen, clock):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if exit0.hitexit() and exit0.c==1:#выход при нажатии кнопки в игре
                     finished = True
+                    pygame.mixer.music.pause()#останавливаем музыку
                 for p in players:
                     p.fire2_start()#начало выстрела игрока при нажатии мыши
 
@@ -820,6 +825,10 @@ def init():
     #надписи при окончании игры
     text0 = font.render("Score: 0",True,BLACK)
     text01 = font.render("Score: 0",True,ORANGE)
+    #фоновая музыка
+    pygame.mixer.music.load(path.join(snd_dir, 'tanks.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
 
 if __name__ == '__main__':
