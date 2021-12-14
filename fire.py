@@ -4,7 +4,9 @@ from pygame.draw import *
 from os import path
 
 pygame.init()
+#Задаем папки с музыкой и изображениями
 img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
 FPS = 30
 
 #задаем цвета
@@ -66,9 +68,9 @@ class Fire(pygame.sprite.Sprite):
         self.speedy = 5
         self.speedx = 5
         self.points=0
-        self.pointmax=10
+        self.pointmax=600
         self.r=70
-        self.time=1000
+        self.time=1890
      
     
     def update(self):
@@ -97,7 +99,7 @@ class Fire(pygame.sprite.Sprite):
         Returns None.
         -------
         """
-        if ((x1-self.rect.x)**2+(y1-self.rect.y)**2)<=(self.r)**2:
+        if ((x1-self.rect.centerx)**2+(y1-self.rect.centery)**2)<=(self.r)**2:
             self.points+=1
         else:    
            self.points=0 
@@ -311,6 +313,9 @@ def init(screen):
     #надписи при окончании игры
     text0 = font.render("Score: 0",True,WHITE)
     text01 = font.render("Score: 0",True,DPURPLE)
+    pygame.mixer.music.load(path.join(snd_dir, 'fire.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
 
 # Запуск цикла игры
