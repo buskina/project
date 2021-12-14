@@ -5,6 +5,7 @@ from os import path
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
 pygame.init()
 FPS = 30
 from os import path
@@ -316,8 +317,12 @@ def init():
         m = Planets()
         all_sprites.add(m)
         planets.add(m)
-    #надписи при окончании игры
+    #надпись счета
     text0 = font.render("Score: 0",True,WHITE)
+    #фоновая музыка
+    pygame.mixer.music.load(path.join(snd_dir, 'Земляне.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
 # Запуск цикла игры
 def game_5(screen, clock):
@@ -335,6 +340,7 @@ def game_5(screen, clock):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
                     finished = True
+                    pygame.mixer.music.pause()#останавливаем музыку
             if event.type == pygame.QUIT:#выход через программу
                 finished = True
             if event.type == pygame.KEYDOWN:
@@ -353,5 +359,7 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    game_5(screen,clock)   
+    game_5(screen,clock) 
+    
+  
 
