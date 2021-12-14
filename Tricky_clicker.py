@@ -23,6 +23,7 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 CELLNUM = 10
 CELLSIZE = HEIGHT//CELLNUM
 
+
 class Cell:
     def __init__(self, screen: pygame.Surface):
         """ Конструктор класса Cell
@@ -84,7 +85,7 @@ class Empty(Cell):
         Cell.__init__(self, screen)
         self.type = 1
         self.time = randint(30, 60)
-        
+
         empty = pygame.image.load(path.join(img_dir, 'empty.jpg')).convert()
         empty = pygame.transform.scale(empty, (CELLSIZE, CELLSIZE))
 
@@ -142,7 +143,8 @@ class Timer(Cell):
         energy = pygame.image.load(path.join(img_dir, 'energy.png')).convert()
         energy = pygame.transform.scale(energy, (CELLSIZE, CELLSIZE))
 
-        energy2 = pygame.image.load(path.join(img_dir, 'energy2.png')).convert()
+        energy2 = pygame.image.load(
+            path.join(img_dir, 'energy2.png')).convert()
         energy2 = pygame.transform.scale(energy2, (CELLSIZE, CELLSIZE))
 
         self.im = rd.choice([energy, energy2])
@@ -157,7 +159,7 @@ class Tricky(Cell):
         Cell.__init__(self, screen)
         self.type = 5
         self.time = randint(30, 60)
-        
+
         money = pygame.image.load(path.join(img_dir, 'money.png')).convert()
         money = pygame.transform.scale(money, (CELLSIZE, CELLSIZE))
 
@@ -181,7 +183,6 @@ def fielding(number_of_cells, screen):
     return field
 
 
-
 def planting(screen, field, number_of_cells):
     """
     Функция меняет параметры каждой клетки
@@ -198,8 +199,8 @@ def planting(screen, field, number_of_cells):
             field[i][j].move(field)
             field[i][j].draw()
 
-def action(field, number_of_cells):
 
+def action(field, number_of_cells):
     """
     Функция изменения всего поля за каждую единицу времени
     """
@@ -217,7 +218,6 @@ def draw(field, number_of_cells):
             field[i][j].draw()
 
 
-
 def testing(field, number_of_cells, event, game_manager, screen):
     """
     Функция проверки попадания в ячейку для каждой ячейки поля
@@ -227,12 +227,11 @@ def testing(field, number_of_cells, event, game_manager, screen):
     y = event.pos[1] // CELLSIZE
 
     if not (0 <= x < number_of_cells):
-        return 
+        return
     if not (0 <= y < number_of_cells):
         return
     if field[x][y].type == 0:
-        return 
-
+        return
 
     field[x][y].effect(game_manager)
     field[x][y] = Cell(screen)
@@ -244,10 +243,12 @@ def testing(field, number_of_cells, event, game_manager, screen):
         x = randint(0, CELLNUM - 1)
         y = randint(0, CELLNUM - 1)
         if field[x][y].type == 0:
-            field[x][y] = rd.choice([Tricky(screen), Timer(screen), Zeroer(screen), Ordinary(screen), Empty(screen)])
+            field[x][y] = rd.choice([Tricky(screen), Timer(
+                screen), Zeroer(screen), Ordinary(screen), Empty(screen)])
             field[x][y].x = x
             field[x][y].y = y
             chosen = True
+
 
 def background_creator(screen):
     # Установка фона
@@ -255,8 +256,9 @@ def background_creator(screen):
     background_rect = background.get_rect()
     screen.blit(background, background_rect)
 
+
 def game_2(screen, clock):
-    
+
     game_manager = {
         'score': 0,
         'time left': 60,
@@ -271,7 +273,7 @@ def game_2(screen, clock):
 
     field = fielding(CELLNUM, screen)
     planting(screen, field, CELLNUM)
-    
+
     background_creator(screen)
     pygame.mixer.music.load(path.join(snd_dir, 'clicker.ogg'))
     pygame.mixer.music.set_volume(0.4)
@@ -323,6 +325,7 @@ def game_2(screen, clock):
             not_finished = False
             pygame.display.update()
             pygame.time.delay(500)
+
 
 if __name__ == '__main__':
     pygame.init()

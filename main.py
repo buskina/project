@@ -2,8 +2,8 @@ import pygame
 from random import *
 import numpy as np
 from os import path
-from Treasure import game_1
-from Tricky_clicker import game_2
+from treasure import game_1
+from tricky_clicker import game_2
 from tanks import game_3
 from fire import game_4
 from balls import game_5
@@ -20,10 +20,11 @@ GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
-#вводим папку с фоновой музыкой
+# вводим папку с фоновой музыкой
 snd_dir = path.join(path.dirname(__file__), 'snd')
 
-class Button():
+
+class Button:
     def __init__(self, screen, pos, dimentions, borderwidth, text):
         """ Конструктор класса Button
         Args:
@@ -41,7 +42,6 @@ class Button():
 
         surface = font.render(text, True, BLACK)
 
-
         self.textx = self.x + (self.width - surface.get_width()) / 2
         self.texty = self.y + (self.height - surface.get_height()) / 2
 
@@ -58,16 +58,15 @@ class Button():
     def hitbutton(self):
         """Попадание  в кнопку. Осуществляется действие"""
         x1, y1 = pygame.mouse.get_pos()
-        if self.x <= x1 and x1 <= self.x+self.width and self.y <= y1 and y1 <= self.y+self.height:
-            return True
-        else:
-            return False
+        return self.x <= x1 <= self.x+self.width and self.y <= y1 <= self.y+self.height
+
 
 def musicl():
     pygame.mixer.music.load(path.join(snd_dir, 'menu.ogg'))
     pygame.mixer.music.set_volume(0.4)
     pygame.mixer.music.play(loops=-1)
-    
+
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -75,7 +74,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 30)
 
 
-b1 = Button(screen, ( 10, 10), (100, 50), 3, "LEVEL 1")
+b1 = Button(screen, (10, 10), (100, 50), 3, "LEVEL 1")
 b2 = Button(screen, (120, 10), (100, 50), 3, "LEVEL 2")
 b3 = Button(screen, (230, 10), (100, 50), 3, "LEVEL 3")
 b4 = Button(screen, (340, 10), (100, 50), 3, "LEVEL 4")
@@ -86,7 +85,6 @@ finished = False
 
 while not finished:
     screen.fill(WHITE)
-    
 
     b1.draw()
     b2.draw()
@@ -97,7 +95,7 @@ while not finished:
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:   
+        if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if b1.hitbutton():
