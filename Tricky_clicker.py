@@ -18,6 +18,7 @@ MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
 
 img_dir = path.join(path.dirname(__file__), 'img2')
+snd_dir = path.join(path.dirname(__file__), 'snd')
 
 CELLNUM = 10
 CELLSIZE = HEIGHT//CELLNUM
@@ -272,6 +273,9 @@ def game_2(screen, clock):
     planting(screen, field, CELLNUM)
     
     background_creator(screen)
+    pygame.mixer.music.load(path.join(snd_dir, 'clicker.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
     not_finished = True
     while not_finished:
