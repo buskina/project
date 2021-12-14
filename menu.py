@@ -102,12 +102,16 @@ while not finished:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if b1.hitbutton():
                 game_1(screen, clock)
+                musicl()
             elif b2.hitbutton():
                 game_3(screen, clock)
+                musicl()
             elif b3.hitbutton():
                 game_2(screen, clock)
+                musicl()
             elif b4.hitbutton():
                 game_4(screen, clock)
+                musicl()
             elif b5.hitbutton():
                 game_5(screen, clock)
                 musicl()
