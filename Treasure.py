@@ -16,9 +16,9 @@ GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
-
+#Задаем папки с изображениями, с музыкой
 img_dir = path.join(path.dirname(__file__), 'img2')
-
+snd_dir = path.join(path.dirname(__file__), 'snd')
 def pos_generation():
     # Генерация положения сокровища и вычисление количества градиентных кругов
     global x, y
@@ -109,6 +109,10 @@ def init():
     counter = 0
     secs = 20
     scorevalue = ""
+    #фоновая музыка
+    pygame.mixer.music.load(path.join(snd_dir, 'treasure.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
 # Вот так нужно засунуть основной цикл в функцию
 def game_1(screen, clock):
