@@ -1,8 +1,10 @@
 from random import choice, randint
 import pygame
 from pygame.draw import *
+from os import path
+
+img_dir = path.join(path.dirname(__file__), 'img')
 pygame.init()
-pygame.display.set_caption("Space!")
 FPS = 30
 from os import path
 #задаем цвета
@@ -48,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
-        self.image=pl1_img
+        pl1_img = pygame.image.load(path.join(img_dir, "pl1.png")).convert()
         self.k=40
         self.image = pygame.transform.scale(pl1_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
@@ -151,6 +153,7 @@ class Planets(pygame.sprite.Sprite):
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             obj.score += self.points
             obj.k=int((obj.k+self.k)/2)
+            pl1_img = pygame.image.load(path.join(img_dir, "pl1.png")).convert()
             obj.image = pygame.transform.scale(pl1_img, (self.k, self.k))
             obj.image.set_colorkey(BLACK)
             text0 = font.render("Score: "+str(obj.score),True,WHITE)
@@ -184,7 +187,7 @@ class Planets(pygame.sprite.Sprite):
                     self.rect.centerx+=self.r/5
                     obj.rect.centerx-=obj.r/5  
 class Exit(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, screen):
         """
         Конструктор класса Exit
         
@@ -215,8 +218,9 @@ class Exit(pygame.sprite.Sprite):
         -------
         """
         pygame.sprite.Sprite.__init__(self)
+        self.screen = screen
         self.image = pygame.Surface((50, 40))
-        self.image=exit_img
+        exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
         self.image = pygame.transform.scale(exit_img, (60, 60))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -230,21 +234,21 @@ class Exit(pygame.sprite.Sprite):
         self.r=20
     def draw(self):
         """Функция рисует табличку выхода"""
-        polygon(screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,LPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],0)
-        polygon(screen,DPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,DPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
     def drawbut(self):
         """Функция рисует кнопку выхода"""
-        polygon(screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+        polygon(self.screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
-        polygon(screen,BLUE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+        polygon(self.screen,BLUE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],0)
@@ -273,81 +277,81 @@ class Exit(pygame.sprite.Sprite):
         if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
             self.draw()
             if obj.k < self.min:
-                screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
+                text1 = font.render("Вы слишком маленький :(",True,DPURPLE)
+                self.screen.blit(text1, [WIDTH/2-self.a+40,HEIGHT/2])
             elif obj.k > self.max:
-                screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
+                text2 = font.render("Вы слишком большой :)",True,DPURPLE)
+                self.screen.blit(text2, [WIDTH/2-self.a+50,HEIGHT/2])
             else:
                 self.drawbut()
-                screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
-                screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
-                screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+                text3 = font.render("Game over!",True,DPURPLE)
+                text4 = font.render("EXIT",True,DPURPLE)
+                self.screen.blit(text3, [WIDTH/2-50,HEIGHT/2-40])
+                self.screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+                self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
                 self.c=1
                         
-
+def background_creator(screen):
+    # Установка фона
+    background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
+    background_rect = background.get_rect()
+    screen.blit(background, background_rect)
                
-#задаем папку, где хранятся изображения и фон          
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
-background_rect = background.get_rect()
-#добавляем изображения
-exit_img = pygame.image.load(path.join(img_dir, "портал.png")).convert()
-pl1_img = pygame.image.load(path.join(img_dir, "pl1.png")).convert()
-pl2_img = pygame.image.load(path.join(img_dir, "pl2.png")).convert()
-pl3_img = pygame.image.load(path.join(img_dir, "pl3.png")).convert()
-pl4_img = pygame.image.load(path.join(img_dir, "pl4.png")).convert()
-pl5_img = pygame.image.load(path.join(img_dir, "pl5.png")).convert()
-pl6_img = pygame.image.load(path.join(img_dir, "pl6.png")).convert()
-#создаем выход и игрока
-all_sprites = pygame.sprite.Group()
-planets = pygame.sprite.Group()
-exit1 = Exit()
-all_sprites.add(exit1)
-player = Player()
-all_sprites.add(player)
-clock = pygame.time.Clock()
-#создаем планеты
-for i in range(4):
-    m = Planets()
-    all_sprites.add(m)
-    planets.add(m)
-#надписи при окончании игры
-text0 = font.render("Score: 0",True,WHITE)
-text4 = font.render("EXIT",True,DPURPLE)
-text3 = font.render("Game over!",True,DPURPLE)
-text1 = font.render("Вы слишком маленький :(",True,DPURPLE)
-text2 = font.render("Вы слишком большой :)",True,DPURPLE)
+def init():
+    global all_sprites, planets, text0, exit1, player
+    #задаем папку, где хранятся изображения и фон          
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    #создаем выход и игрока
+    all_sprites = pygame.sprite.Group()
+    planets = pygame.sprite.Group()
+    exit1 = Exit(screen)
+    all_sprites.add(exit1)
+    player = Player()
+    all_sprites.add(player)
+    #создаем планеты
+    for i in range(4):
+        m = Planets()
+        all_sprites.add(m)
+        planets.add(m)
+    #надписи при окончании игры
+    text0 = font.render("Score: 0",True,WHITE)
 
 # Переменная, отвечающая за начало общего цикла игры.
 finished = False
 # Запуск цикла игры
-while not finished:
-    screen.fill(BLACK)
-    screen.blit(background, background_rect)#отрисовка фона
-    all_sprites.draw(screen)#отрисовка всех спрайтов
-    exit1.hit(player)#проверяет попадание игрока в выход
-    screen.blit(text0, [40,100])#выводит счет
-    pygame.display.update()
-    clock.tick(FPS)
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
+def game_5(screen, clock):
+    init()
+    finished = False
+    while not finished:
+        screen.fill(BLACK)
+        background_creator(screen) #отрисовка фона
+        all_sprites.draw(screen)#отрисовка всех спрайтов
+        exit1.hit(player)#проверяет попадание игрока в выход
+        screen.blit(text0, [40,100])#выводит счет
+        pygame.display.update()
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
+                    finished = True
+            if event.type == pygame.QUIT:#выход через программу
                 finished = True
-        if event.type == pygame.QUIT:#выход через программу
-            finished = True
-        if event.type == pygame.KEYDOWN:
-            if event.key==pygame.K_ESCAPE:#выход через ESCAPE
-                finished = True
-    for p in planets:
-        p.hit(player)# проверяет столкновение игрока с планетами
-        for i in planets:
-            p.hitp(i)#проверяет столкновение планет между собой
-        
-    if exit1.c==0:
-        # Обновляем координаты всех объектов если игра не закончена
-        all_sprites.update()  
-       
-    
-    
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE:#выход через ESCAPE
+                    finished = True
+        for p in planets:
+            p.hit(player)# проверяет столкновение игрока с планетами
+            for i in planets:
+                p.hitp(i)#проверяет столкновение планет между собой
+            
+        if exit1.c==0:
+            # Обновляем координаты всех объектов если игра не закончена
+            all_sprites.update()  
 
-pygame.quit()
+if __name__ == '__main__':
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    clock = pygame.time.Clock()
+    game_5(screen,clock) 
+    

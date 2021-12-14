@@ -2,9 +2,11 @@ from random import choice, randint
 import pygame
 from pygame.draw import *
 from os import path
+
 pygame.init()
-pygame.display.set_caption("Follow to the fire!")
+img_dir = path.join(path.dirname(__file__), 'img')
 FPS = 30
+
 #задаем цвета
 RED = (255, 0, 0)
 PURPLE = (240,0,255)
@@ -14,9 +16,11 @@ WHITE = (255, 255, 255)
 RUST = (210,150,75)
 DBLUE=(0,0,128)
 DPURPLE = (70,0,70)
+
 #задаем ширину и высоту экрана
 WIDTH = 800
 HEIGHT = 600
+
 #счет очков
 score=0
 font = pygame.font.Font(None, 25)
@@ -53,7 +57,7 @@ class Fire(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=targ1_img
+        fire_img = pygame.image.load(path.join(img_dir, "fire.png")).convert()
         self.image = pygame.transform.scale(fire_img, (100, 100))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -125,7 +129,7 @@ class Targ(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=targ1_img
+        targ1_img = pygame.image.load(path.join(img_dir, "light.png")).convert()
         self.image = pygame.transform.scale(targ1_img, (70, 70))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -167,7 +171,7 @@ class Targ(pygame.sprite.Sprite):
             all_sprites.add(m)
             targets.add(m)
 class Exit():
-    def __init__(self):
+    def __init__(self, screen):
         """ 
         Конструктор класса Exit
         
@@ -188,19 +192,20 @@ class Exit():
         self.b=100
         self.a=150
         self.c=0
+        self.screen = screen
     def draw(self):
         """Функция рисует рамку выхода"""
-        polygon(screen,BLUE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,BLUE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],0)
-        polygon(screen,DPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,DPURPLE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
     def drawbut(self):
         """Функция рисует кнопку выхода"""
-        polygon(screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+        polygon(self.screen,DPURPLE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
@@ -209,17 +214,21 @@ class Exit():
         вызывает функцию рисования кнопки"""
         self.c=1
         self.draw()
-        screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
-        screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
-        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        text1 = font.render("YOU WIN!",True,DPURPLE)
+        text4 = font.render("EXIT",True,DPURPLE)
+        self.screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
+        self.screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
+        self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def end2(self):
         """Проигрыш.Рисует табличку с надписью"""
         self.c=1
         self.draw()
-        screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
-        screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
-        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        text2 = font.render("YOU LOSED",True,DPURPLE)
+        text4 = font.render("EXIT",True,DPURPLE)
+        self.screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
+        self.screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
+        self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def hitexit(self):
         """
@@ -231,90 +240,87 @@ class Exit():
             return  True  
         
         
-
-def init():
-    """
-    Функция задающая значения основным переменным
-    """
-    global finished
-    # Переменная, отвечающая за начало общего цикла игры.
-    finished = False
     
-def mainFire(screen, clock):
+def game_4(screen, clock):
     """
     Функция запускает основной цикл программы
     """
-    global finished
-    init()
+    init(screen)
+    finished = False
+
     while not finished:    
         screen.fill(BLACK)
-        screen.blit(background, background_rect)# рисуем фон
+        background_creator(screen)
         screen.blit(text0, [40,100])
         all_sprites.draw(screen)
-        #выигрыш при нужном числе очков огня
+        
         if fire.points==fire.pointmax:
             exit1.end1()
-            #проигрыш, если время истекло
+            
         elif fire.time<=0:
             exit1.end2()
+
         pygame.display.update()
         clock.tick(FPS)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:#выход через программу
+            if event.type == pygame.QUIT:
                 finished = True
             if event.type == pygame.KEYDOWN:
-                if event.key==pygame.K_ESCAPE:#выход через ESCAPE
+                if event.key==pygame.K_ESCAPE:
                     finished = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if exit1.hitexit() and exit1.c==1:#выход при нажатии кнопки в игре
+                if exit1.hitexit() and exit1.c==1:
                     finished = True
                 x1,y1=pygame.mouse.get_pos()
                 for t in targets:
-                    t.hit(x1,y1)#проверка нажатия на цели
+                    t.hit(x1,y1)
             elif event.type == pygame.MOUSEMOTION:
                 if exit1.c==0:
                     x1,y1=pygame.mouse.get_pos()
-                    fire.hit(x1,y1)#проверка контакта с огнем
+                    fire.hit(x1,y1)
         if exit1.c==0:
-        #обновление всех спрайтов если игра не окончена
-            all_sprites.update()
         
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-#задаем папку, где хранятся изображения и фон 
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load(path.join(img_dir, 'f3.png')).convert()
-background_rect = background.get_rect()
-#добавляем изображение целей
-targ1_img = pygame.image.load(path.join(img_dir, "light.png")).convert()
-#добавляем изображение огня
-fire_img = pygame.image.load(path.join(img_dir, "fire.png")).convert()
-all_sprites = pygame.sprite.Group()
-targets = pygame.sprite.Group()
-fire=Fire()
-#создаем выход
-exit1=Exit()
-#добавляем огонь к спрайтам
-all_sprites.add(fire)
-#добавляем  цели
-for i in range(4):
-    m = Targ()
-    all_sprites.add(m)
-    targets.add(m)
-#надписи при окончании игры
-text0 = font.render("Score: 0",True,WHITE)
-text01 = font.render("Score: 0",True,DPURPLE)
-text1 = font.render("YOU WIN!",True,DPURPLE)
-text2 = font.render("YOU LOSED",True,DPURPLE)
-text4 = font.render("EXIT",True,DPURPLE)
+            all_sprites.update()
+
+def background_creator(screen):
+    # Установка фона
+    background = pygame.image.load(path.join(img_dir, 'f3.png')).convert()
+    background_rect = background.get_rect()
+    screen.blit(background, background_rect)
+
+def init(screen):
+    """
+    Функция задающая значения основным переменным
+    """
+    global text0, text01
+    global exit1, all_sprites, fire, background, background_rect, targets
+
+    background_creator(screen)
+    all_sprites = pygame.sprite.Group()
+    targets = pygame.sprite.Group()
+    fire=Fire()
+    #создаем выход
+    exit1=Exit(screen)
+    #добавляем огонь к спрайтам
+    all_sprites.add(fire)
+    #добавляем  цели
+    for i in range(4):
+        m = Targ()
+        all_sprites.add(m)
+        targets.add(m)
+    #надписи при окончании игры
+    text0 = font.render("Score: 0",True,WHITE)
+    text01 = font.render("Score: 0",True,DPURPLE)
 
 
 # Запуск цикла игры
     
 if __name__ == '__main__':
+
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    mainFire(screen,clock)          
+
+    game_4(screen,clock)          
     
-    
-pygame.quit()
+    pygame.quit()

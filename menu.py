@@ -4,6 +4,9 @@ import numpy as np
 from os import path
 from Treasure import game_1
 from Tricky_clicker import game_2
+from tanks import game_3
+from fire import game_4
+from balls import game_5
 
 WIDTH = 800
 HEIGHT = 600
@@ -18,78 +21,86 @@ YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
 
+
 class Button():
-    def __init__(self, screen):
+    def __init__(self, screen, pos, dimentions, borderwidth, text):
         """ Конструктор класса Button
         Args:
 
         """
         self.screen = screen
-        self.x = 0
-        self.y = 0
-        self.dx = 0
-        self.dy = 0
-        self.textx = 0
-        self.texty = 0
-        self.font = pygame.font.Font(None, 30)
+        self.x, self.y = pos
+        self.width, self.height = dimentions
+
         self.fontcolor = BLACK
-        self.borderwidth = 0
+        self.borderwidth = borderwidth
         self.bordercolor = BLACK
         self.color = WHITE
-        self.text = ""
+        self.text = text
+
+        surface = font.render(text, True, BLACK)
+
+
+        self.textx = self.x + (self.width - surface.get_width()) / 2
+        self.texty = self.y + (self.height - surface.get_height()) / 2
+
     def draw(self):
         """Функция рисует кнопку"""
-        pygame.draw.rect(self.screen, self.bordercolor, 
-        (self.x-self.borderwidth, self.y-self.borderwidth,
-        self.dx+2*self.borderwidth, self.dy+2*self.borderwidth))
-        pygame.draw.rect(self.screen, self.color, 
-        (self.x, self.y, self.dx, self.dy))
-        scoreboard=self.font.render(self.text, True, self.fontcolor)
+        pygame.draw.rect(self.screen, self.bordercolor,
+                         (self.x - self.borderwidth, self.y - self.borderwidth,
+                          self.width + 2 * self.borderwidth, self.height + 2 * self.borderwidth))
+        pygame.draw.rect(self.screen, self.color,
+                         (self.x, self.y, self.width, self.height))
+        scoreboard = font.render(self.text, True, self.fontcolor)
         self.screen.blit(scoreboard, (self.textx, self.texty))
 
     def hitbutton(self):
         """Попадание  в кнопку. Осуществляется действие"""
-        x1,y1=pygame.mouse.get_pos()
-        if self.x<=x1 and x1<=self.x+self.dx and self.y<=y1 and y1<=self.y+self.dy:
-            return  True
+        x1, y1 = pygame.mouse.get_pos()
+        if self.x <= x1 and x1 <= self.x+self.width and self.y <= y1 and y1 <= self.y+self.height:
+            return True
         else:
             return False
+
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+font = pygame.font.Font(None, 30)
+
+
+b1 = Button(screen, ( 10, 10), (100, 50), 3, "LEVEL 1")
+b2 = Button(screen, (120, 10), (100, 50), 3, "LEVEL 2")
+b3 = Button(screen, (230, 10), (100, 50), 3, "LEVEL 3")
+b4 = Button(screen, (340, 10), (100, 50), 3, "LEVEL 4")
+b5 = Button(screen, (450, 10), (100, 50), 3, "LEVEL 5")
+
+
 finished = False
 while not finished:
     screen.fill(WHITE)
-    b1 = Button(screen)
-    b1.x = 10
-    b1.y = 10
-    b1.dx = 100
-    b1.dy = 50
-    b1.textx = 20
-    b1.texty = 20
-    b1.borderwidth = 3
-    b1.text = "LEVEL 1"
+
     b1.draw()
-    b2 = Button(screen)
-    b2.x = 120
-    b2.y = 10
-    b2.dx = 100
-    b2.dy = 50
-    b2.textx = 130
-    b2.texty = 20
-    b2.borderwidth = 3
-    b2.text = "LEVEL 2"
     b2.draw()
+    b3.draw()
+    b4.draw()
+    b5.draw()
+
     pygame.display.update()
     clock.tick(FPS)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:   
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if b1.hitbutton():
                 game_1(screen, clock)
-            if b2.hitbutton():
+            elif b2.hitbutton():
                 game_2(screen, clock)
+            elif b3.hitbutton():
+                game_3(screen, clock)
+            elif b4.hitbutton():
+                game_4(screen, clock)
+            elif b5.hitbutton():
+                game_5(screen, clock)
 pygame.quit()

@@ -6,7 +6,7 @@ import random as rd
 
 WIDTH = 800
 HEIGHT = 600
-FPS = 30
+FPS = 60
 
 # Задание цветов
 WHITE = (255, 255, 255)
@@ -282,7 +282,7 @@ def game_2(screen, clock):
 
         # Отрисовка всего
         screen.fill(BLACK)
-        action(screen, field, CELLNUM)
+        action(field, CELLNUM)
         draw(field, CELLNUM)
         scorevalue = "score = "+str(game_manager['score'])
         scoreboard = font.render(scorevalue, True, WHITE)
@@ -298,7 +298,7 @@ def game_2(screen, clock):
                 not_finished = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 testing(field, CELLNUM, event, game_manager, screen)
-                action(screen, field, CELLNUM)
+                action(field, CELLNUM)
                 pygame.display.update()
 
         # Выход из игры по окончании установленного времени
