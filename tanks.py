@@ -3,7 +3,9 @@ from random import choice, randint
 import pygame
 from pygame.draw import *
 from os import path
+
 pygame.init()
+img_dir = path.join(path.dirname(__file__), 'img')
 FPS = 30
 #задаем цвета
 GREEN = (0, 255, 0)
@@ -20,7 +22,7 @@ GR=2
 font = pygame.font.Font(None, 25)
 
 class Tank2(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, screen):
         """ 
         Конструктор класса Tank2
         
@@ -54,7 +56,7 @@ class Tank2(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
-        self.image=tank2_img
+        tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
         self.image = pygame.transform.scale(tank2_img, (100, 100))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -67,6 +69,8 @@ class Tank2(pygame.sprite.Sprite):
         self.bn=math.atan(1)
         self.f=50
         self.u=0
+
+        self.screen = screen
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
         Обновляет значения x,y """
@@ -83,14 +87,14 @@ class Tank2(pygame.sprite.Sprite):
         Целится в игрока
         obj type __main__.Player"""
         self.S=self.rect.x-obj.rect.x
-        self.u=int((self.S*GR/2*math.sin(2*self.bn))**0.5)
+        self.u=int(abs((self.S*GR/2*math.sin(2*self.bn)))**0.5)
     def drawl(self):
         """Отображает здоровье врага"""
-        polygon(screen,GREEN,[(WIDTH-5,20 ),
+        polygon(self.screen,GREEN,[(WIDTH-5,20 ),
                             (WIDTH-5-self.health,20),
                             (WIDTH-5-self.health,25),
                              (WIDTH-5,25 )],0)
-        polygon(screen,BLACK,[(WIDTH-5,20 ),
+        polygon(self.screen,BLACK,[(WIDTH-5,20 ),
                             (WIDTH-5-100,20),
                             (WIDTH-5-100,25),
                              (WIDTH-5,25 )],1)
@@ -125,7 +129,7 @@ class Enemy(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=en_img
+        en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
         self.image = pygame.transform.scale(en_img, (35, 35))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -205,7 +209,7 @@ class Enemy(pygame.sprite.Sprite):
             m.rect.centery=obj.rect.centery
       
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, screen):
         """ 
         Конструктор класса Player
         
@@ -253,7 +257,7 @@ class Player(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((50, 40))
-        self.image=tank1_img
+        tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
         self.a=100
         self.image = pygame.transform.scale(tank1_img, (self.a, self.a))
         self.image.set_colorkey(BLACK)
@@ -277,6 +281,8 @@ class Player(pygame.sprite.Sprite):
         self.L=40
         self.b=5
         self.H=5
+
+        self.screen = screen
     def update(self):
         """Перемещение игрока. В зависимости от нажатия кнопки задает скорость
         Обновляет значения x """
@@ -340,11 +346,11 @@ class Player(pygame.sprite.Sprite):
                 self.bn = 180+math.atan((-y1+self.rect.centery) / (x1-self.rect.centerx))
     def drawl(self):
         """Отображает здоровье игрока"""
-        polygon(screen,GREEN,[(5,20 ),
+        polygon(self.screen,GREEN,[(5,20 ),
                             (5+self.health,20),
                             (5+self.health,25),
                              (5,25 )],0)
-        polygon(screen,BLACK,[(5,20 ),
+        polygon(self.screen,BLACK,[(5,20 ),
                             (5+100,20),
                             (5+100,25),
                              (5,25 )],1)   
@@ -354,14 +360,14 @@ class Player(pygame.sprite.Sprite):
         self.xo=self.rect.centerx+self.a+self.L*math.cos(self.bn)#конец ствола по х
         self.yo=-self.L*math.sin(self.bn)+self.rect.centery-self.b#конец ствола по y
         #рисует ствол пушки
-        polygon(screen,self.color,[(self.rect.centerx+self.a,self.rect.centery-self.b),
+        polygon(self.screen,self.color,[(self.rect.centerx+self.a,self.rect.centery-self.b),
                             (self.xo,self.yo),
                             (self.xo-self.H*math.sin(self.bn),
                              self.yo-self.H*math.cos(self.bn)),
                             (self.rect.centerx+self.a-self.H*math.sin(self.bn),
                              -self.b+self.rect.centery-self.H*math.cos(self.bn))],0)
         #Обводит контур
-        polygon(screen,BLACK,[(self.rect.centerx+self.a,self.rect.centery-self.b),
+        polygon(self.screen,BLACK,[(self.rect.centerx+self.a,self.rect.centery-self.b),
                             (self.xo,self.yo),
                             (self.xo-self.H*math.sin(self.bn),
                              self.yo-self.H*math.cos(self.bn)),
@@ -417,7 +423,7 @@ class Shells(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=shell_img
+        shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
         self.image = pygame.transform.scale(shell_img, (35, 35))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -511,7 +517,7 @@ class Targ1(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=targ1_img
+        targ1_img = pygame.image.load(path.join(img_dir, "targ1.png")).convert()
         self.image = pygame.transform.scale(targ1_img, (40, 30))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -530,7 +536,7 @@ class Targ1(pygame.sprite.Sprite):
             self.rect.y = randint(-100, -40)
             self.speedy = randint(1, 8)      
 class Exit():
-    def __init__(self):
+    def __init__(self, screen):
         """ 
         Конструктор класса Exit
         
@@ -552,19 +558,21 @@ class Exit():
         self.b=100
         self.a=150
         self.c=0
+
+        self.screen = screen
     def draw(self):
         """Функция рисует рамку выхода"""
-        polygon(screen,SALMON,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,SALMON,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],0)
-        polygon(screen,ORANGE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
+        polygon(self.screen,ORANGE,[(WIDTH/2-self.a,HEIGHT/2-self.b ),
                             (WIDTH/2+self.a,HEIGHT/2-self.b),
                             (WIDTH/2+self.a,HEIGHT/2+self.b),
                              (WIDTH/2-self.a,HEIGHT/2+self.b)],5)
     def drawbut(self):
         """Функция рисует кнопку выхода"""
-        polygon(screen,ORANGE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
+        polygon(self.screen,ORANGE,[(WIDTH/2-self.a/2,HEIGHT/2+self.b/3 ),
                             (WIDTH/2+self.a/2,HEIGHT/2+self.b/3),
                             (WIDTH/2+self.a/2,HEIGHT/2+2*self.b/3),
                              (WIDTH/2-self.a/2,HEIGHT/2+2*self.b/3)],5)
@@ -573,17 +581,21 @@ class Exit():
         вызывает функцию рисования кнопки"""
         self.c=1
         self.draw()
-        screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
-        screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
-        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        text4 = font.render("EXIT",True,ORANGE)
+        text1 = font.render("YOU WIN!",True,ORANGE)
+        self.screen.blit(text1, [WIDTH/2-50,HEIGHT/2-40])
+        self.screen.blit(text01, [WIDTH/2-40,HEIGHT/2])
+        self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def end2(self):
         """Проигрыш.Рисует табличку с надписью"""
         self.c=1
         self.draw()
-        screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
-        screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
-        screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
+        text2 = font.render("YOU LOSED",True,ORANGE)
+        text4 = font.render("EXIT",True,ORANGE)
+        self.screen.blit(text2, [WIDTH/2-50,HEIGHT/2-40])
+        self.screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
+        self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
         self.drawbut()
     def hitexit(self):
         """Попадание  в кнопку выхода. Осуществляется выход из игры.
@@ -620,7 +632,7 @@ class Explode(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=exp_img
+        exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
         self.k=40
         self.image = pygame.transform.scale(exp_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
@@ -640,6 +652,7 @@ class Explode(pygame.sprite.Sprite):
             self.k+=5
         if self.t<=self.tx:
             self.k-=1
+        exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
         self.image = pygame.transform.scale(exp_img, (self.k, self.k))
         self.image.set_colorkey(BLACK)
 class Expl2(pygame.sprite.Sprite):
@@ -670,7 +683,7 @@ class Expl2(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40, 40))
-        self.image=exp2_img
+        exp2_img = pygame.image.load(path.join(img_dir, "exp2.png")).convert()
         self.k=40
         self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
         self.image.set_colorkey(BLACK)
@@ -689,28 +702,27 @@ class Expl2(pygame.sprite.Sprite):
             self.k+=5
         if self.t<=self.tx:
             self.k-=1
+        exp2_img = pygame.image.load(path.join(img_dir, "exp2.png")).convert()
         self.image = pygame.transform.scale(exp2_img, (2*self.k, self.k))
         self.image.set_colorkey(BLACK)
 
-def init():
-    """
-    Функция задающая значения основным переменным
-    """
-    global finished
-    # Переменная, отвечающая за начало общего цикла игры.
-    finished = False 
-    tank2=Tank2()
-    
-    
-def maintank(screen, clock):
+def background_creator(screen):
+    # Установка фона
+    background = pygame.image.load(path.join(img_dir, 'ftanks.png')).convert()
+    background_rect = background.get_rect()
+    screen.blit(background, background_rect)
+
+
+def game_3(screen, clock):
     """
     Функция запускает основной цикл программы
     """
-    global finished,tank2,enemy
+    global tank2,enemy
     init()
+    finished = False
     while not finished:
         screen.fill(BLACK)
-        screen.blit(background, background_rect)#отрисовка фона
+        background_creator(screen)
         screen.blit(text0, [40,100])#выводит счет
     
         if tank2 in all_sprites:#если уже создан враг
@@ -736,7 +748,7 @@ def maintank(screen, clock):
     
         if player1.time==player1.tx:#Замена друга на врага в tx
             player2.kill()
-            tank2=Tank2()
+            tank2=Tank2(screen)
             all_sprites.add(tank2)
     
         for s in shells:
@@ -771,55 +783,48 @@ def maintank(screen, clock):
         if exit0.c==0:
         # Обновляем координаты всех объектов если игра не закончена
             all_sprites.update()
-pygame.init()
-#задаем папку, где хранятся изображения и фон  
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load(path.join(img_dir, 'ftanks.png')).convert()
-background_rect = background.get_rect()
-#добавляем изображения
-targ1_img = pygame.image.load(path.join(img_dir, "targ1.png")).convert()
-tank1_img = pygame.image.load(path.join(img_dir, "tank1.png")).convert()
-tank2_img = pygame.image.load(path.join(img_dir, "tank2.png")).convert()
-shell_img = pygame.image.load(path.join(img_dir, "sh.png")).convert()
-en_img = pygame.image.load(path.join(img_dir, "en.png")).convert()
-exp_img = pygame.image.load(path.join(img_dir, "exp.png")).convert()
-exp2_img = pygame.image.load(path.join(img_dir, "exp2.png")).convert()
-all_sprites = pygame.sprite.Group()
-#создаем группу целей,снарядов, вражеский снаряд
-targets = pygame.sprite.Group()
-shells = pygame.sprite.Group()
-enemy= Enemy()
-clock = pygame.time.Clock()
-#добавляем цели
-for i in range(5):
-    m = Targ1()
-    all_sprites.add(m)
-    targets.add(m)
-#создаем игрока, врага, выход
-player1 = Player()
-player2 = Player()
-player2.rect.centerx = 120
-players = pygame.sprite.Group()
-tank2=Tank2()
-all_sprites.add(player1,player2)
-players.add(player1,player2)
-exit0=Exit()
-#надписи при окончании игры
-text0 = font.render("Score: 0",True,BLACK)
-text01 = font.render("Score: 0",True,ORANGE)
-text1 = font.render("YOU WIN!",True,ORANGE)
-text2 = font.render("YOU LOSED",True,ORANGE)
-text4 = font.render("EXIT",True,ORANGE)
-# Переменная, отвечающая за начало общего цикла игры.
-finished = False
-# Запуск цикла игры
+
+
+def init():
+    """
+    Функция, задающая значения основным переменным
+    """
+    global shells, targets, enemy, tank2, exit0
+    global text0, text01
+    global player1, player2, players
+    global all_sprites
+
+    #задаем папку, где хранятся изображения и фон  
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    background_creator(screen)
+    
+    all_sprites = pygame.sprite.Group()
+    #создаем группу целей,снарядов, вражеский снаряд
+    targets = pygame.sprite.Group()
+    shells = pygame.sprite.Group()
+    enemy= Enemy()
+    #добавляем цели
+    for i in range(5):
+        m = Targ1()
+        all_sprites.add(m)
+        targets.add(m)
+    #создаем игрока, врага, выход
+    player1 = Player(screen)
+    player2 = Player(screen)
+    player2.rect.centerx = 120
+    players = pygame.sprite.Group()
+    tank2=Tank2(screen)
+    all_sprites.add(player1,player2)
+    players.add(player1,player2)
+    exit0=Exit(screen)
+    #надписи при окончании игры
+    text0 = font.render("Score: 0",True,BLACK)
+    text01 = font.render("Score: 0",True,ORANGE)
 
 
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    maintank(screen,clock) 
+    game_3(screen,clock) 
     
-pygame.quit()
