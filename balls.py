@@ -3,6 +3,7 @@ import pygame
 from pygame.draw import *
 from os import path
 
+
 img_dir = path.join(path.dirname(__file__), 'img')
 pygame.init()
 FPS = 30
@@ -150,7 +151,7 @@ class Planets(pygame.sprite.Sprite):
         удаляется цель, создается новая
         """
         global  text0
-        if (obj.rect.x-self.rect.x)**2 +(obj.rect.y-self.rect.y)**2 <(self.r+obj.r)**2:
+        if (obj.rect.centerx-self.rect.centerx)**2 +(obj.rect.centery-self.rect.centery)**2 <(self.r+obj.r)**2:
             obj.score += self.points
             obj.k=int((obj.k+self.k)/2)
             pl1_img = pygame.image.load(path.join(img_dir, "pl1.png")).convert()
@@ -290,7 +291,8 @@ class Exit(pygame.sprite.Sprite):
                 self.screen.blit(text0, [WIDTH/2-40,HEIGHT/2])
                 self.screen.blit(text4, [WIDTH/2-20,HEIGHT/2+42])
                 self.c=1
-                        
+                    
+
 def background_creator(screen):
     # Установка фона
     background = pygame.image.load(path.join(img_dir, 'f1.png')).convert()
@@ -301,7 +303,7 @@ def init():
     global all_sprites, planets, text0, exit1, player
     #задаем папку, где хранятся изображения и фон          
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
+    background_creator(screen)
     #создаем выход и игрока
     all_sprites = pygame.sprite.Group()
     planets = pygame.sprite.Group()
@@ -317,8 +319,6 @@ def init():
     #надписи при окончании игры
     text0 = font.render("Score: 0",True,WHITE)
 
-# Переменная, отвечающая за начало общего цикла игры.
-finished = False
 # Запуск цикла игры
 def game_5(screen, clock):
     init()
@@ -353,5 +353,5 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    game_5(screen,clock) 
-    
+    game_5(screen,clock)   
+
