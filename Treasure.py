@@ -1,5 +1,5 @@
 import pygame
-from random import *
+from random import randint
 import numpy as np
 from os import path
 
@@ -17,11 +17,13 @@ YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
 
+img_dir = path.join(path.dirname(__file__), 'img2')
+
 def pos_generation():
     # Генерация положения сокровища и вычисление количества градиентных кругов
     global x, y
-    x = randint(0,WIDTH)
-    y = randint(0,HEIGHT)
+    x = randint(0,WIDTH-20)
+    y = randint(0,HEIGHT-20)
     radmax = max(np.sqrt(x**2+y**2), max(np.sqrt(x**2+(HEIGHT-y)**2), 
     max(np.sqrt((WIDTH-x)**2+y**2), np.sqrt((WIDTH-x)**2+(HEIGHT-y)**2))))
     n = int(radmax/20+2)
@@ -37,13 +39,16 @@ def layer_creator(n):
     layer = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     for i in range(1,n,1):
         pygame.draw.circle(layer, colors[i], (x, y), 20*(n-i))
-    pygame.draw.circle(layer, WHITE, (x, y), 5)
     layer = pygame.transform.scale(layer, (WIDTH, int(HEIGHT/3)))
+    treasure= pygame.image.load(path.join(img_dir, 'treasure.png')).convert()
+    treasure = pygame.transform.scale(treasure, (20, 20))
+    treasure_rect = treasure.get_rect(topleft=(x-10, y/3-10))
+    treasure.set_colorkey(BLACK)
+    layer.blit(treasure, treasure_rect)
     return layer
 
 def background_creator(screen):
     # Установка фона
-    img_dir = path.join(path.dirname(__file__), 'img2')
     background = pygame.image.load(path.join(img_dir, 'treasure2.jpg')).convert()
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     background_rect = background.get_rect()
@@ -77,6 +82,8 @@ def processing(event, layer, screen):
         scorevalue = "finished"
     elif event.type == pygame.MOUSEMOTION:
         x1,y1=pygame.mouse.get_pos()
+        pygame.draw.line(screen, BLACK, (x1-20, y1+20), (x1-10, y1+10), 5)
+        pygame.draw.circle(screen, BLACK, (x1, y1), 14, 5)
         screen.blit(layer, (x1-10, y1-10), (x1-10, y1-2*HEIGHT/3-10, 20, 20))
         scorevalue = ""
     elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -100,7 +107,7 @@ def finishing(scorevalue, screen):
 def init():
     global counter, secs, scorevalue
     counter = 0
-    secs = 10
+    secs = 20
     scorevalue = ""
 
 # Вот так нужно засунуть основной цикл в функцию

@@ -96,9 +96,9 @@ while not finished:
             if b1.hitbutton():
                 game_1(screen, clock)
             elif b2.hitbutton():
-                game_2(screen, clock)
-            elif b3.hitbutton():
                 game_3(screen, clock)
+            elif b3.hitbutton():
+                game_2(screen, clock)
             elif b4.hitbutton():
                 game_4(screen, clock)
             elif b5.hitbutton():
