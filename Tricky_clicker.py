@@ -1,6 +1,5 @@
 import pygame
-from random import *
-
+from random import randint
 from os import path
 import random as rd
 
@@ -249,11 +248,17 @@ def testing(field, number_of_cells, event, game_manager, screen):
             field[x][y].y = y
             chosen = True
 
+def background_creator(screen):
+    # Установка фона
+    background = pygame.image.load(path.join(img_dir, 'back.jpg')).convert()
+    background_rect = background.get_rect()
+    screen.blit(background, background_rect)
+
 def game_2(screen, clock):
     
     game_manager = {
         'score': 0,
-        'time left': 120,
+        'time left': 60,
         'freezing': 0,
         'acceleration': 1
     }
@@ -266,6 +271,8 @@ def game_2(screen, clock):
     field = fielding(CELLNUM, screen)
     planting(screen, field, CELLNUM)
     
+    background_creator(screen)
+
     not_finished = True
     while not_finished:
         # Работа счетчика времени
@@ -282,6 +289,7 @@ def game_2(screen, clock):
 
         # Отрисовка всего
         screen.fill(BLACK)
+        background_creator(screen)
         action(field, CELLNUM)
         draw(field, CELLNUM)
         scorevalue = "score = "+str(game_manager['score'])
