@@ -20,7 +20,8 @@ GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
-
+#вводим папку с фоновой музыкой
+snd_dir = path.join(path.dirname(__file__), 'snd')
 
 class Button():
     def __init__(self, screen, pos, dimentions, borderwidth, text):
@@ -62,7 +63,11 @@ class Button():
         else:
             return False
 
-
+def musicl():
+    pygame.mixer.music.load(path.join(snd_dir, 'menu.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
+    
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -76,10 +81,12 @@ b3 = Button(screen, (230, 10), (100, 50), 3, "LEVEL 3")
 b4 = Button(screen, (340, 10), (100, 50), 3, "LEVEL 4")
 b5 = Button(screen, (450, 10), (100, 50), 3, "LEVEL 5")
 
-
+musicl()
 finished = False
+
 while not finished:
     screen.fill(WHITE)
+    
 
     b1.draw()
     b2.draw()
@@ -103,4 +110,5 @@ while not finished:
                 game_4(screen, clock)
             elif b5.hitbutton():
                 game_5(screen, clock)
+                musicl()
 pygame.quit()
