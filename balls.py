@@ -187,7 +187,7 @@ class Planets(pygame.sprite.Sprite):
                     obj.speedx=-abs(obj.speedx)
                     self.rect.centerx+=self.r/5
                     obj.rect.centerx-=obj.r/5  
-class Exit(pygame.sprite.Sprite):
+class Exit0(pygame.sprite.Sprite):
     def __init__(self, screen):
         """
         Конструктор класса Exit
@@ -307,7 +307,7 @@ def init():
     #создаем выход и игрока
     all_sprites = pygame.sprite.Group()
     planets = pygame.sprite.Group()
-    exit1 = Exit(screen)
+    exit1 = Exit0(screen)
     all_sprites.add(exit1)
     player = Player()
     all_sprites.add(player)
