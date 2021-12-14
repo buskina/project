@@ -3,7 +3,7 @@ import pygame
 from pygame.draw import *
 from os import path
 
-
+#Задаем папки с музыкой и изображениями
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
 pygame.init()
