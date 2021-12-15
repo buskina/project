@@ -192,7 +192,7 @@ def game_3(screen, clock):
 
         if fire.points == fire.pointmax:
             finished = True
-            return score
+            return score+1
 
         elif fire.time <= 0:
             finished = True
@@ -203,9 +203,7 @@ def game_3(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    finished = True
+                return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 x1, y1 = pygame.mouse.get_pos()
                 for t in targets:
