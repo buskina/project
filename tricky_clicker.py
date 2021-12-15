@@ -43,8 +43,8 @@ class Cell:
             время до закрытия ячейки
         chosen - 
             в ячейку предлагается поместить новый объект
-            
-            
+
+
         Returns None.
         -------
         """
@@ -331,6 +331,7 @@ def game_2(screen, clock):
         if game_manager['time left'] < 0:
             not_finished = False
             return game_manager['score']
+
 
 if __name__ == '__main__':
     pygame.init()

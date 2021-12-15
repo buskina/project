@@ -286,7 +286,7 @@ class Player(pygame.sprite.Sprite):
         self.f2_on = 0
         self.bn = 1
 
-        self.tx = 120
+        self.tx = 540
         self.health = 100
         self.r = self.a/2
         self.color = DGREEN

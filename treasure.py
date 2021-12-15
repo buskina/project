@@ -68,7 +68,7 @@ def layer_creator(n):
 def background_creator(screen):
     """
     Установка фона
-    
+
     Returns None.
     -------
     """
@@ -91,7 +91,7 @@ def timer(screen):
     -------
     """
     global secs, counter
-   
+
     counter += 1
     min = secs//60
     sec = secs - 60*min
@@ -110,7 +110,7 @@ def time_manager(secs, screen):
 
     Parameters
     ----------
-    
+
     secs: type int
     screen: type pygame.Surface
 
@@ -176,9 +176,6 @@ def finishing(scorevalue, screen):
     pygame.display.update()
     pygame.time.delay(500)
 
-# Тут задаются важные для работы данной программы константы. Общие, касающиеся внешнего вида экрана
-# И цвета не надо
-
 
 def init():
     """
@@ -193,10 +190,9 @@ def init():
     pygame.mixer.music.set_volume(0.4)
     pygame.mixer.music.play(loops=-1)
 
-# Вот так нужно засунуть основной цикл в функцию
-
 
 def game_0(screen, clock):
+
     init()
     screen.fill(BLACK)
     pygame.display.update()
@@ -215,12 +211,7 @@ def game_0(screen, clock):
         return True
     else:
         return False
-    
 
-
-# А еще нужно сделать вот такую штуку. Последнее, что мы обсуждали - стоит ли инитить
-# screen в каждой игре. Вообще нет, твои функции должны его принимать как аргумент, он будет
-# задан в файле с меню (потому у меня screen как аргумент везде)
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))

@@ -10,17 +10,18 @@ pygame.init()
 FPS = 30
 # задаем цвета
 RED = (255, 0, 0)
-DPURPLE = (94, 0, 94)
+DPURPLE = (70, 0, 70)
 LPURPLE = (166, 166, 255)
 PINK = (255, 171, 190)
 BLUE = (175, 214, 255)
+LBLUE = (175, 214, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 # задаем ширину и высоту экрана
 WIDTH = 800
 HEIGHT = 600
 
-font = pygame.font.Font(None, 25)
+font = pygame.font.Font(None, 30)
 
 
 class Player(pygame.sprite.Sprite):
@@ -248,25 +249,17 @@ class Exit0(pygame.sprite.Sprite):
 
     def draw(self):
         """Функция рисует табличку выхода"""
-        polygon(self.screen, LPURPLE, [(WIDTH/2-self.a, HEIGHT/2-self.b),
-                                       (WIDTH/2+self.a, HEIGHT/2-self.b),
-                                       (WIDTH/2+self.a, HEIGHT/2+self.b),
-                                       (WIDTH/2-self.a, HEIGHT/2+self.b)], 0)
-        polygon(self.screen, DPURPLE, [(WIDTH/2-self.a, HEIGHT/2-self.b),
-                                       (WIDTH/2+self.a, HEIGHT/2-self.b),
-                                       (WIDTH/2+self.a, HEIGHT/2+self.b),
-                                       (WIDTH/2-self.a, HEIGHT/2+self.b)], 5)
+        pygame.draw.rect(self.screen, DPURPLE, (WIDTH/2-self.a-3,
+                         HEIGHT/2-self.b-3, 2*self.a+6, 2*self.b+6))
+        pygame.draw.rect(self.screen, LPURPLE, (WIDTH/2-self.a,
+                         HEIGHT/2-self.b, 2*self.a, 2*self.b))
 
     def drawbut(self):
         """Функция рисует кнопку выхода"""
-        polygon(self.screen, DPURPLE, [(WIDTH/2-self.a/2, HEIGHT/2+self.b/3),
-                                       (WIDTH/2+self.a/2, HEIGHT/2+self.b/3),
-                                       (WIDTH/2+self.a/2, HEIGHT/2+2*self.b/3),
-                                       (WIDTH/2-self.a/2, HEIGHT/2+2*self.b/3)], 5)
-        polygon(self.screen, BLUE, [(WIDTH/2-self.a/2, HEIGHT/2+self.b/3),
-                                    (WIDTH/2+self.a/2, HEIGHT/2+self.b/3),
-                                    (WIDTH/2+self.a/2, HEIGHT/2+2*self.b/3),
-                                    (WIDTH/2-self.a/2, HEIGHT/2+2*self.b/3)], 0)
+        pygame.draw.rect(self.screen, DPURPLE, (WIDTH/2-self.a /
+                         2-3, HEIGHT/2+self.b/3-3, 2*self.a/2+6, self.b/3+6))
+        pygame.draw.rect(self.screen, LBLUE, (WIDTH/2-self.a/2,
+                         HEIGHT/2+self.b/3, 2*self.a/2, self.b/3))
 
     def hitexit(self):
         """Осуществляется выход из игры.
@@ -295,17 +288,17 @@ class Exit0(pygame.sprite.Sprite):
             self.draw()
             if obj.k < self.min:
                 text1 = font.render("Вы слишком маленький :(", True, DPURPLE)
-                self.screen.blit(text1, [WIDTH/2-self.a+40, HEIGHT/2])
+                self.screen.blit(text1, [WIDTH/2-self.a+20, HEIGHT/2])
             elif obj.k > self.max:
                 text2 = font.render("Вы слишком большой :)", True, DPURPLE)
-                self.screen.blit(text2, [WIDTH/2-self.a+50, HEIGHT/2])
+                self.screen.blit(text2, [WIDTH/2-self.a+30, HEIGHT/2])
             else:
                 self.drawbut()
-                text3 = font.render("Game over!", True, DPURPLE)
-                text4 = font.render("EXIT", True, DPURPLE)
-                self.screen.blit(text3, [WIDTH/2-50, HEIGHT/2-40])
-                self.screen.blit(text0, [WIDTH/2-40, HEIGHT/2])
-                self.screen.blit(text4, [WIDTH/2-20, HEIGHT/2+42])
+                text3 = font.render("Игра пройдена!", True, DPURPLE)
+                text4 = font.render("Назад в меню", True, DPURPLE)
+                self.screen.blit(text3, [WIDTH/2-75, HEIGHT/2-40])
+                self.screen.blit(text0, [WIDTH/2-35, HEIGHT/2])
+                self.screen.blit(text4, [WIDTH/2-70, HEIGHT/2+42])
                 self.c = 1
 
 
