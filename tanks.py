@@ -492,6 +492,10 @@ class Shells(pygame.sprite.Sprite):
             all_sprites.add(m)
             m.rect.centerx = obj.rect.centerx
             m.rect.centery = obj.rect.centery
+            if obj in targets:
+                m = Targ1()
+                all_sprites.add(m)
+                targets.add(m)
 
     def hit0(self, obj):
         """Попадание  в врага
@@ -718,7 +722,7 @@ def game_1(screen, clock):
             if tank2 in all_sprites:
                 s.hit0(tank2)  # попадание в танк врага
             for t in targets:
-                s.hit(t)  # попадание в цель
+                s.hit(t)# попадание в цель
         pygame.display.update()
 
         clock.tick(FPS)
