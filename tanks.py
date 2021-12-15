@@ -749,7 +749,7 @@ def background_creator(screen):
     screen.blit(background, background_rect)
 
 
-def game_3(screen, clock):
+def game_1(screen, clock):
     """
     Функция запускает основной цикл программы
     """
@@ -868,4 +868,4 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    game_3(screen, clock)
+    game_1(screen, clock)

@@ -2,11 +2,11 @@ import pygame
 from random import *
 import numpy as np
 from os import path
-from treasure import game_1
+from treasure import game_0
+from tanks import game_1
 from tricky_clicker import game_2
-from tanks import game_3
-from fire import game_4
-from balls import game_5
+from fire import game_3
+from balls import game_4
 
 WIDTH = 800
 HEIGHT = 600
@@ -80,25 +80,32 @@ def musicl():
     pygame.mixer.music.set_volume(0.4)
     pygame.mixer.music.play(loops=-1)
 
-def game_loop(access, screen, clock):
-    access = game_1(screen, clock)
+def exit_0(access):
+    if access:
+        text1 = font.render("Победа! Теперь рыцарь", True, DPURPLE)
+        text2 = font.render("переживет посвящение :)", True, DPURPLE)
+        screen.blit(text1, (280, 220))
+        screen.blit(text2, (275, 240))
+    else: 
+        text = font.render("Сокровище не найдено :(", True, DPURPLE)
+        screen.blit(text, (270, 230))
+
+def game_loop(i, access, screen, clock):
+    games = [game_0, game_1, game_2, game_3, game_4]
+    exits = [exit_0]
+    access_last = games[i](screen, clock)
+    access_current = max(access, access_last)
+
     board = Button(screen, (250, 200), (300, 200), LPURPLE, DPURPLE, 3, "", DPURPLE)
     back_to_menu = Button(screen, (300, 340), (200, 40), LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
     replay = Button(screen, (300, 280), (200, 40), LBLUE, DPURPLE, 3, "Играть заново", DPURPLE)
-    print(access)
+
     finished = 0
     while not finished:
         board.draw()
         back_to_menu.draw()
         replay.draw()
-        if access:
-            text1 = font.render("Победа! Теперь рыцарь", True, DPURPLE)
-            text2 = font.render("переживет посвящение :)", True, DPURPLE)
-            screen.blit(text1, (280, 220))
-            screen.blit(text2, (275, 240))
-        else: 
-            text = font.render("Сокровище не тут :(", True, DPURPLE)
-            screen.blit(text, (300, 230))
+        exits[i](access_last)
         pygame.display.update()
         musicl()
         for event in pygame.event.get():
@@ -106,23 +113,16 @@ def game_loop(access, screen, clock):
                 finished = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if replay.hit():
-                    access = game_1(screen, clock)
+                    access_last = games[i](screen, clock)
+                    access_current = max(access_current, access_last)
                     board.draw()
                     back_to_menu.draw()
                     replay.draw()
-                    if access:
-                        text1 = font.render("Победа! Теперь рыцарь", True, DPURPLE)
-                        text2 = font.render("переживет посвящение :)", True, DPURPLE)
-                        screen.blit(text1, (280, 220))
-                        screen.blit(text2, (275, 240))
-                    else: 
-                        text = font.render("Сокровище не тут :(", True, DPURPLE)
-                        screen.blit(text, (260, 210))
+                    exits[i](access_last)
                     musicl()
-                    print(access)
                 elif back_to_menu.hit():
                     finished = True
-    return access
+    return access_current
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -139,7 +139,7 @@ replay = Button(screen, (350, 380), (100, 40), LPURPLE, DPURPLE, 3, "Играт�
 
 musicl()
 finished = False
-access = 0
+access = [0, 0, 0, 0, 0]
 
 while not finished:
     screen.fill(WHITE)
@@ -158,10 +158,10 @@ while not finished:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if b1.hit():
-                access = game_loop(access, screen, clock)
+                access[0] = game_loop(0, access[0], screen, clock)
             elif b2.hit():
-                if access:
-                    game_3(screen, clock)
+                if access[0]:
+                    game_1(screen, clock)
                     musicl()
                 else:
                     print("You don't have enough points to enter")
@@ -169,9 +169,9 @@ while not finished:
                 game_2(screen, clock)
                 musicl()
             elif b4.hit():
-                game_4(screen, clock)
+                game_3(screen, clock)
                 musicl()
             elif b5.hit():
-                game_5(screen, clock)
+                game_4(screen, clock)
                 musicl()
 pygame.quit()

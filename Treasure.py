@@ -128,7 +128,7 @@ def init():
 # Вот так нужно засунуть основной цикл в функцию
 
 
-def game_1(screen, clock):
+def game_0(screen, clock):
     init()
     screen.fill(BLACK)
     pygame.display.update()
@@ -158,4 +158,4 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    game_1(screen, clock)
+    game_0(screen, clock)

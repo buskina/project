@@ -177,7 +177,7 @@ class Targ(pygame.sprite.Sprite):
             targets.add(m)
 
 
-def game_4(screen, clock):
+def game_3(screen, clock):
     """
     Функция запускает основной цикл программы
     """
@@ -252,6 +252,6 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
-    game_4(screen, clock)
+    game_3(screen, clock)
 
     pygame.quit()

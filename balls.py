@@ -340,7 +340,7 @@ def init():
 # Запуск цикла игры
 
 
-def game_5(screen, clock):
+def game_4(screen, clock):
     init()
     finished = False
     while not finished:
@@ -377,4 +377,4 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    game_5(screen, clock)
+    game_4(screen, clock)
