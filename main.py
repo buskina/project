@@ -2,9 +2,9 @@ import pygame
 from random import *
 import numpy as np
 from os import path
-from Treasure import game_0
+from treasure import game_0
 from tanks import game_1
-from Tricky_clicker import game_2
+from tricky_clicker import game_2
 from fire import game_3
 from balls import game_4
 
