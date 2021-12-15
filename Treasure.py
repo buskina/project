@@ -143,7 +143,12 @@ def game_1(screen, clock):
         for event in pygame.event.get():
             processing(event, layer, screen)
         pygame.display.update()
+    if scorevalue == "Victory!":
+        return True
+    else:
+        return False
     finishing(scorevalue, screen)
+    
 
 
 # А еще нужно сделать вот такую штуку. Последнее, что мы обсуждали - стоит ли инитить
