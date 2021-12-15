@@ -147,7 +147,6 @@ def game_0(screen, clock):
         return True
     else:
         return False
-    finishing(scorevalue, screen)
     
 
 

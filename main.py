@@ -90,9 +90,19 @@ def exit_0(access):
         text = font.render("Сокровище не найдено :(", True, DPURPLE)
         screen.blit(text, (270, 230))
 
+def exit_1(access):
+    if access:
+        text1 = font.render("Победа! Доверяй,", True, DPURPLE)
+        text2 = font.render("но проверяй :)", True, DPURPLE)
+        screen.blit(text1, (310, 220))
+        screen.blit(text2, (325, 240))
+    else: 
+        text = font.render("Поражение :(", True, DPURPLE)
+        screen.blit(text, (270, 230))
+
 def game_loop(i, access, screen, clock):
     games = [game_0, game_1, game_2, game_3, game_4]
-    exits = [exit_0]
+    exits = [exit_0, exit_1]
     access_last = games[i](screen, clock)
     access_current = max(access, access_last)
 
@@ -133,13 +143,10 @@ b2 = Button(screen, (235, 260), (60, 50), WHITE, BLACK, 3, "202", BLACK)
 b3 = Button(screen, (380, 260), (60, 50), WHITE, BLACK, 3, "303", BLACK)
 b4 = Button(screen, (525, 260), (60, 50), WHITE, BLACK, 3, "404", BLACK)
 b5 = Button(screen, (680, 260), (60, 50), WHITE, BLACK, 3, "505", BLACK)
-board = Button(screen, (250, 200), (300, 400), LPURPLE, DPURPLE, 3, "", DPURPLE)
-back_to_menu = Button(screen, (350, 440), (100, 40), LPURPLE, DPURPLE, 3, "Назад в меню", DPURPLE)
-replay = Button(screen, (350, 380), (100, 40), LPURPLE, DPURPLE, 3, "Играть заново", DPURPLE)
 
 musicl()
 finished = False
-access = [0, 0, 0, 0, 0]
+access = [1, 0, 0, 0, 0]
 
 while not finished:
     screen.fill(WHITE)
@@ -161,8 +168,7 @@ while not finished:
                 access[0] = game_loop(0, access[0], screen, clock)
             elif b2.hit():
                 if access[0]:
-                    game_1(screen, clock)
-                    musicl()
+                    access[1] = game_loop(1, access[1], screen, clock)
                 else:
                     print("You don't have enough points to enter")
             elif b3.hit():

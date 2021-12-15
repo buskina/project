@@ -286,7 +286,7 @@ class Player(pygame.sprite.Sprite):
         self.f2_on = 0
         self.bn = 1
 
-        self.tx = 540
+        self.tx = 120
         self.health = 100
         self.r = self.a/2
         self.color = DGREEN
@@ -561,81 +561,6 @@ class Targ1(pygame.sprite.Sprite):
             self.speedy = randint(1, 8)
 
 
-class Exit():
-    def __init__(self, screen):
-        """ 
-        Конструктор класса Exit
-
-        Parameters
-        ----------
-
-        b: type int 
-            высота таблички выхода
-        а: type int 
-            ширина таблички выхода
-        с: type int
-            принимает значение 0 в течение всей игры,
-            пока игрок не попадет на выход.
-            Используется для остановки спрайтов в последующий момент
-
-        Returns None.
-        -------
-        """
-        self.b = 100
-        self.a = 150
-        self.c = 0
-
-        self.screen = screen
-
-    def draw(self):
-        """Функция рисует рамку выхода"""
-        polygon(self.screen, SALMON, [(WIDTH/2-self.a, HEIGHT/2-self.b),
-                                      (WIDTH/2+self.a, HEIGHT/2-self.b),
-                                      (WIDTH/2+self.a, HEIGHT/2+self.b),
-                                      (WIDTH/2-self.a, HEIGHT/2+self.b)], 0)
-        polygon(self.screen, ORANGE, [(WIDTH/2-self.a, HEIGHT/2-self.b),
-                                      (WIDTH/2+self.a, HEIGHT/2-self.b),
-                                      (WIDTH/2+self.a, HEIGHT/2+self.b),
-                                      (WIDTH/2-self.a, HEIGHT/2+self.b)], 5)
-
-    def drawbut(self):
-        """Функция рисует кнопку выхода"""
-        polygon(self.screen, ORANGE, [(WIDTH/2-self.a/2, HEIGHT/2+self.b/3),
-                                      (WIDTH/2+self.a/2, HEIGHT/2+self.b/3),
-                                      (WIDTH/2+self.a/2, HEIGHT/2+2*self.b/3),
-                                      (WIDTH/2-self.a/2, HEIGHT/2+2*self.b/3)], 5)
-
-    def end1(self):
-        """Первая концовка игры - выигрыш. Функция выводит соответствующую надпись и счет,
-        вызывает функцию рисования кнопки"""
-        self.c = 1
-        self.draw()
-        text4 = font.render("EXIT", True, ORANGE)
-        text1 = font.render("YOU WIN!", True, ORANGE)
-        self.screen.blit(text1, [WIDTH/2-50, HEIGHT/2-40])
-        self.screen.blit(text01, [WIDTH/2-40, HEIGHT/2])
-        self.screen.blit(text4, [WIDTH/2-20, HEIGHT/2+42])
-        self.drawbut()
-
-    def end2(self):
-        """Проигрыш.Рисует табличку с надписью"""
-        self.c = 1
-        self.draw()
-        text2 = font.render("YOU LOSED", True, ORANGE)
-        text4 = font.render("EXIT", True, ORANGE)
-        self.screen.blit(text2, [WIDTH/2-50, HEIGHT/2-40])
-        self.screen.blit(text0, [WIDTH/2-40, HEIGHT/2])
-        self.screen.blit(text4, [WIDTH/2-20, HEIGHT/2+42])
-        self.drawbut()
-
-    def hitexit(self):
-        """Попадание  в кнопку выхода. Осуществляется выход из игры.
-        Возвращает True"""
-        x1, y1 = pygame.mouse.get_pos()
-        if x1 < WIDTH/2+self.a/2 and x1 > WIDTH/2-self.a/2 and y1 > HEIGHT/2+self.b/3 and y1 < HEIGHT/2+2*self.b/3:
-            return True
-
-
 class Explode(pygame.sprite.Sprite):
     def __init__(self):
         """ 
@@ -771,9 +696,11 @@ def game_1(screen, clock):
                 all_sprites.add(enemy)
                 enemy.start(tank2)
             if tank2.fin1():  # выигрыш
-                exit0.end1()
+                finished = True
+                return player1.score
             if player1.fin2():  # проигрыш
-                exit0.end2()
+                finished = True
+                return 0
             enemy.hit0(player1)  # попадание в игрока
             for s in shells:
                 enemy.hit1(s)  # попадание в cнаряд врага
@@ -798,13 +725,8 @@ def game_1(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # выход через программу
                 finished = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:  # выход через ESCAPE
-                    finished = True
+                return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if exit0.hitexit() and exit0.c == 1:  # выход при нажатии кнопки в игре
-                    finished = True
-                    pygame.mixer.music.pause()  # останавливаем музыку
                 for p in players:
                     p.fire2_start()  # начало выстрела игрока при нажатии мыши
 
@@ -817,16 +739,14 @@ def game_1(screen, clock):
                     p.targetting(x1, y1)  # прицеливание при удержании мыши
         for p in players:
             p.power_up()  # разряжает оружие
-        if exit0.c == 0:
-            # Обновляем координаты всех объектов если игра не закончена
-            all_sprites.update()
+        all_sprites.update()
 
 
 def init():
     """
     Функция, задающая значения основным переменным
     """
-    global shells, targets, enemy, tank2, exit0
+    global shells, targets, enemy, tank2
     global text0, text01
     global player1, player2, players
     global all_sprites
@@ -854,7 +774,7 @@ def init():
     tank2 = Tank2(screen)
     all_sprites.add(player1, player2)
     players.add(player1, player2)
-    exit0 = Exit(screen)
+
     # надписи при окончании игры
     text0 = font.render("Score: 0", True, BLACK)
     text01 = font.render("Score: 0", True, ORANGE)
