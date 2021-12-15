@@ -98,11 +98,19 @@ def exit_1(access):
         screen.blit(text2, (325, 240))
     else: 
         text = font.render("Поражение :(", True, DPURPLE)
-        screen.blit(text, (270, 230))
+        screen.blit(text, (330, 230))
+
+def exit_2(access):
+    if access>=120:
+        text1 = font.render("Победа! 120 БРС :)", True, DPURPLE)
+        screen.blit(text1, (305, 230))
+    else: 
+        text = font.render("Пересдача :(", True, DPURPLE)
+        screen.blit(text, (330, 230))
 
 def game_loop(i, access, screen, clock):
     games = [game_0, game_1, game_2, game_3, game_4]
-    exits = [exit_0, exit_1]
+    exits = [exit_0, exit_1, exit_2]
     access_last = games[i](screen, clock)
     access_current = max(access, access_last)
 
@@ -146,7 +154,7 @@ b5 = Button(screen, (680, 260), (60, 50), WHITE, BLACK, 3, "505", BLACK)
 
 musicl()
 finished = False
-access = [1, 0, 0, 0, 0]
+access = [1, 1, 0, 0, 0]
 
 while not finished:
     screen.fill(WHITE)
@@ -172,8 +180,10 @@ while not finished:
                 else:
                     print("You don't have enough points to enter")
             elif b3.hit():
-                game_2(screen, clock)
-                musicl()
+                if access[1]:
+                    access[2] = game_loop(2, access[2], screen, clock)
+                else:
+                    print("You don't have enough points to enter")
             elif b4.hit():
                 game_3(screen, clock)
                 musicl()

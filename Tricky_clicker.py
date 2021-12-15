@@ -167,7 +167,7 @@ class Tricky(Cell):
 
     def effect(self, game_manager):
         game_manager['score'] += 5
-        game_manager['acceleration'] += 0.2
+        game_manager['acceleration'] += 0.5
 
 
 def fielding(number_of_cells, screen):
@@ -261,7 +261,7 @@ def game_2(screen, clock):
 
     game_manager = {
         'score': 0,
-        'time left': 60,
+        'time left': 30,
         'freezing': 0,
         'acceleration': 1
     }
@@ -310,6 +310,7 @@ def game_2(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 not_finished = False
+                return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 testing(field, CELLNUM, event, game_manager, screen)
                 action(field, CELLNUM)
@@ -317,15 +318,8 @@ def game_2(screen, clock):
 
         # Выход из игры по окончании установленного времени
         if game_manager['time left'] < 0:
-            screen.fill(BLACK)
-            font = pygame.font.Font(None, 72)
-            scorevalue = "Game Over"
-            scoreboard = font.render(scorevalue, True, GREEN)
-            screen.blit(scoreboard, (250, 250))
             not_finished = False
-            pygame.display.update()
-            pygame.time.delay(500)
-
+            return game_manager['score']
 
 if __name__ == '__main__':
     pygame.init()
