@@ -22,7 +22,12 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 
 
 def pos_generation():
-    # Генерация положения сокровища и вычисление количества градиентных кругов
+    """
+    Генерация положения сокровища и вычисление количества градиентных кругов
+
+    Returns None.
+    -------
+    """
     global x, y
     x = randint(0, WIDTH-20)
     y = randint(0, HEIGHT-20)
@@ -33,7 +38,16 @@ def pos_generation():
 
 
 def layer_creator(n):
-    # Сборка массива цветов градиента
+    """
+    Сборка массива цветов градиента
+
+    Parameters
+    ----------
+    n: type int
+
+    Returns None.
+    -------
+    """
     colors = []
     for i in range(n):
         colors.append((255*i/n, 0, 255-255*i/n))
@@ -52,7 +66,12 @@ def layer_creator(n):
 
 
 def background_creator(screen):
-    # Установка фона
+    """
+    Установка фона
+    
+    Returns None.
+    -------
+    """
     background = pygame.image.load(
         path.join(img_dir, 'treasure2.jpg')).convert()
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
@@ -61,8 +80,18 @@ def background_creator(screen):
 
 
 def timer(screen):
+    """
+    Работа счетчика времени.Отображает счетчик времени
+
+    Parameters
+    ----------
+    screen: type pygame.Surface
+
+    Returns None.
+    -------
+    """
     global secs, counter
-    # Работа счетчика времени
+   
     counter += 1
     min = secs//60
     sec = secs - 60*min
@@ -76,6 +105,18 @@ def timer(screen):
 
 
 def time_manager(secs, screen):
+    """
+    Проверяет таймер, задает соответсвующее значение  scorevalue
+
+    Parameters
+    ----------
+    
+    secs: type int
+    screen: type pygame.Surface
+
+    Returns None.
+    -------
+    """
     global scorevalue
     if secs >= 0:
         timer(screen)
@@ -85,6 +126,19 @@ def time_manager(secs, screen):
 
 
 def processing(event, layer, screen):
+    """
+    Проверяет выход из игры и нажатие мыши. 
+    Присваивает scorevalue соответсвующее значение
+
+    Parameters
+    ----------
+    event: type Event
+    layer: type pygame.Surface
+    screen: type pygame.Surface
+
+    Returns None.
+    -------
+    """
     global scorevalue
     if event.type == pygame.QUIT:
         scorevalue = "finished"
@@ -104,6 +158,17 @@ def processing(event, layer, screen):
 
 
 def finishing(scorevalue, screen):
+    """
+    Окончание игры
+
+    Parameters
+    ----------
+    scorevalue: type str
+    screen: type pygame.Surface
+
+    Returns None.
+    -------
+    """
     screen.fill(BLACK)
     font = pygame.font.Font(None, 72)
     scoreboard = font.render(scorevalue, True, GREEN)
@@ -116,6 +181,9 @@ def finishing(scorevalue, screen):
 
 
 def init():
+    """
+    Определяет значение констант
+    """
     global counter, secs, scorevalue
     counter = 0
     secs = 20
