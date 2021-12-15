@@ -841,7 +841,7 @@ def init():
     shells = pygame.sprite.Group()
     enemy = Enemy()
     # добавляем цели
-    for i in range(5):
+    for i in range(10):
         m = Targ1()
         all_sprites.add(m)
         targets.add(m)
