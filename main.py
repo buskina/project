@@ -8,6 +8,8 @@ from tricky_clicker import game_2
 from fire import game_3
 from balls import game_4
 
+import json
+
 WIDTH = 800
 HEIGHT = 600
 FPS = 30
@@ -182,6 +184,7 @@ def game_loop(i, access, screen, clock):
                     finished = True
     return access_current
 
+
 def access_denied(screen):
     """
     Функция отрисовки сообщения закрытого уровня
@@ -189,7 +192,7 @@ def access_denied(screen):
     board = Button(screen, (250, 200), (300, 200),
                    LPURPLE, DPURPLE, 3, "", DPURPLE)
     back_to_menu = Button(screen, (300, 340), (200, 40),
-                    LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
+                          LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
 
     finished = 0
     while not finished:
@@ -200,9 +203,9 @@ def access_denied(screen):
 
         screen.blit(text1, (295, 230))
         screen.blit(text2, (285, 250))
-        
+
         pygame.display.update()
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
@@ -215,6 +218,8 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+musicl()
+
 # Инициализация кнопок входа в уровень
 b1 = Button(screen, (90, 260), (60, 50), WHITE, BLACK, 3, "101", BLACK)
 b2 = Button(screen, (235, 260), (60, 50), WHITE, BLACK, 3, "202", BLACK)
@@ -222,13 +227,63 @@ b3 = Button(screen, (380, 260), (60, 50), WHITE, BLACK, 3, "303", BLACK)
 b4 = Button(screen, (525, 260), (60, 50), WHITE, BLACK, 3, "404", BLACK)
 b5 = Button(screen, (680, 260), (60, 50), WHITE, BLACK, 3, "505", BLACK)
 board = Button(screen, (250, 200), (300, 200),
-                   LPURPLE, DPURPLE, 3, "", DPURPLE)
+               LPURPLE, DPURPLE, 3, "", DPURPLE)
 back_to_menu = Button(screen, (300, 340), (200, 40),
-                    LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
+                      LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
 
-musicl()
+input_box = pygame.Rect(300, 280, 200, 30)
+color_inactive = DPURPLE
+color_active = WHITE
+color = color_inactive
+
+active = False
+name = ''
+done = False
+while not done:
+    background_creator(screen)
+    board.draw()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if input_box.collidepoint(event.pos):
+                active = not active
+            else:
+                active = False
+            color = color_active if active else color_inactive
+        if event.type == pygame.KEYDOWN:
+            if active:
+                if event.key == pygame.K_RETURN:
+                    done = True
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += event.unicode
+    txt_surface = font.render(name, True, DPURPLE)
+
+    width = max(200, txt_surface.get_width()+10)
+
+    text = font.render('Введите имя игрока:', True, DPURPLE)
+    pygame.draw.rect(screen, color, (297, 277, width+6, 36))
+    pygame.draw.rect(screen, LBLUE, input_box)
+    screen.blit(text, (296, 250))
+    screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+    pygame.display.update()
+    clock.tick(30)
+
+
 finished = False
-access = [0, 0, 0, 0, 0]
+
+try:
+    with open('table.txt', 'r') as f:
+        data = json.load(f)
+        access = data[name]
+except:
+    with open("table.txt", "w") as f:
+        data = {}
+        json.dump(data, f)
+        access = [0, 0, 0, 0, 0]
+
 
 while not finished:
     screen.fill(WHITE)
@@ -271,4 +326,11 @@ while not finished:
                     musicl()
                 else:
                     access_denied(screen)
+
+
+data[name] = access
+
+with open('table.txt', 'w') as f:
+    json.dump(data, f)
+
 pygame.quit()
