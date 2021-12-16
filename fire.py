@@ -240,7 +240,9 @@ def init(screen):
         m = Targ()
         all_sprites.add(m)
         targets.add(m)
-
+    pygame.mixer.music.load(path.join(snd_dir, 'fire.ogg'))
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(loops=-1)
 
 # Запуск цикла игры
 
