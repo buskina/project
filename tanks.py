@@ -486,16 +486,17 @@ class Shells(pygame.sprite.Sprite):
             player1.score += self.points
             text0 = font.render("Score: "+str(player1.score), True, BLACK)
             text01 = font.render("Score: "+str(player1.score), True, ORANGE)
+            if obj in targets:
+                h = Targ1()
+                all_sprites.add(h)
+                targets.add(h)
             self.kill()
             obj.kill()
             m = Expl2()
             all_sprites.add(m)
             m.rect.centerx = obj.rect.centerx
             m.rect.centery = obj.rect.centery
-            if obj in targets:
-                m = Targ1()
-                all_sprites.add(m)
-                targets.add(m)
+            
 
     def hit0(self, obj):
         """Попадание  в врага
