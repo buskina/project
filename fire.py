@@ -70,7 +70,7 @@ class Fire(pygame.sprite.Sprite):
         self.speedy = 5
         self.speedx = 5
         self.points = 0
-        self.pointmax = 10
+        self.pointmax = 300
         self.r = 70
         self.time = 1000
 
@@ -100,8 +100,9 @@ class Fire(pygame.sprite.Sprite):
         Returns None.
         -------
         """
-        if hypot(x1 - self.rect.x, y1 - self.rect.y) < self.r:
+        if hypot(x1 - self.rect.centerx, y1 - self.rect.centery) < self.r:
             self.points += 1
+
         else:
             self.points = 0
 
