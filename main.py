@@ -1,6 +1,5 @@
 import pygame
 from random import *
-import numpy as np
 from os import path
 from treasure import game_0
 from tanks import game_1
@@ -38,7 +37,33 @@ class Button:
     def __init__(self, screen, pos, dimentions, color, bordercolor, borderwidth, text, fontcolor):
         """ Конструктор класса Button
         Args:
-
+        ----------
+        screen: type pygame.Surface
+            экран для кнопки
+        x : type int
+            положение кнопки по горизонтали
+        y : type int
+            положение ячейки по вертикали
+        width: type int
+            ширина ячейки
+        height: type int
+            высота ячейки
+        fontcolor: type tuple
+            цвет шрифта текста
+        borderwidth: type int
+            ширина границы
+        bordercolor: type tuple
+            цвет границы
+        color: type tuple
+            цвет ячейки
+        text: type string
+            текст внутри ячейки
+        surface: type pygame.Surface
+            поверхность под текст
+        textx: type int
+            положение текста по горизонтали
+        texty: type int
+            положение текста по вертикали 
         """
         self.screen = screen
         self.x, self.y = pos
@@ -71,7 +96,12 @@ class Button:
 
 
 def background_creator(screen):
-    # Установка фона
+    """
+    Установка фона
+
+    Returns None.
+    -------
+    """
     background = pygame.image.load(
         path.join(img_dir, 'backmenu.jpg')).convert()
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
@@ -80,6 +110,12 @@ def background_creator(screen):
 
 
 def musicl():
+    """
+    Запуск музыки
+
+    Returns None.
+    -------
+    """
     pygame.mixer.music.load(path.join(snd_dir, 'menu.ogg'))
     pygame.mixer.music.set_volume(0.4)
     pygame.mixer.music.play(loops=-1)
@@ -88,6 +124,13 @@ def musicl():
 def exit_0(access):
     """
     Функция создает завершающий экран соответствующей игры
+
+    Parameters
+    ----------
+    access: type int
+
+    Returns None.
+    -------
     """
     if access:
         text1 = font.render("Победа! Теперь рыцарь", True, DPURPLE)
@@ -102,6 +145,13 @@ def exit_0(access):
 def exit_1(access):
     """
     Функция создает завершающий экран соответствующей игры
+
+    Parameters
+    ----------
+    access: type int
+
+    Returns None.
+    -------
     """
     if access:
         text1 = font.render("Победа! Доверяй,", True, DPURPLE)
@@ -116,6 +166,13 @@ def exit_1(access):
 def exit_2(access):
     """
     Функция создает завершающий экран соответствующей игры
+
+    Parameters
+    ----------
+    access: type int
+
+    Returns None.
+    -------
     """
     if access >= 120:
         text1 = font.render("Победа! 120 БРС :)", True, DPURPLE)
@@ -128,6 +185,13 @@ def exit_2(access):
 def exit_3(access):
     """
     Функция создает завершающий экран соответствующей игры
+
+    Parameters
+    ----------
+    access: type int
+
+    Returns None.
+    -------
     """
     if access:
         text1 = font.render("Победа! Огонек не погас :)", True, DPURPLE)
@@ -144,6 +208,17 @@ def exit_3(access):
 def game_loop(i, access, screen, clock):
     """
     Функция позволяет играть в игру многократно
+
+    Parameters
+    ----------
+    i: type int
+    access: type int
+    screen: type pygame.Surface
+    clock: type pygame.Clock
+
+    Returns access_current: type int.
+    -------
+
     """
     games = [game_0, game_1, game_2, game_3, game_4]
     exits = [exit_0, exit_1, exit_2, exit_3]
@@ -188,6 +263,13 @@ def game_loop(i, access, screen, clock):
 def access_denied(screen):
     """
     Функция отрисовки сообщения закрытого уровня
+
+    Parameters
+    ----------
+    screen: type pygame.Screen
+
+    Returns None.
+    -------
     """
     board = Button(screen, (250, 200), (300, 200),
                    LPURPLE, DPURPLE, 3, "", DPURPLE)
@@ -231,6 +313,7 @@ board = Button(screen, (250, 200), (300, 200),
 back_to_menu = Button(screen, (300, 340), (200, 40),
                       LBLUE, DPURPLE, 3, "Назад в меню", DPURPLE)
 
+# Создание поля ввода имени игрока
 input_box = pygame.Rect(300, 280, 200, 30)
 color_inactive = DPURPLE
 color_active = WHITE
@@ -246,6 +329,7 @@ while not done:
         if event.type == pygame.QUIT:
             done = True
         if event.type == pygame.MOUSEBUTTONDOWN:
+            # Изменение цвета границы при нажатии
             if input_box.collidepoint(event.pos):
                 active = not active
             else:
@@ -253,9 +337,11 @@ while not done:
             color = color_active if active else color_inactive
         if event.type == pygame.KEYDOWN:
             if active:
+                # Нажатие на enter
                 if event.key == pygame.K_RETURN:
                     done = True
                 elif event.key == pygame.K_BACKSPACE:
+                    # Стирание неправильно написанного
                     name = name[:-1]
                 else:
                     name += event.unicode
@@ -263,6 +349,7 @@ while not done:
 
     width = max(200, txt_surface.get_width()+10)
 
+    # Отрисовка всего
     text = font.render('Введите имя игрока:', True, DPURPLE)
     pygame.draw.rect(screen, color, (297, 277, width+6, 36))
     pygame.draw.rect(screen, LBLUE, input_box)
@@ -274,6 +361,7 @@ while not done:
 
 finished = False
 
+# Открытие файла для сохранения прогресса
 try:
     with open('table.txt', 'r') as f:
         data = json.load(f)
@@ -327,7 +415,7 @@ while not finished:
                 else:
                     access_denied(screen)
 
-
+# Сохранение прогресса
 data[name] = access
 
 with open('table.txt', 'w') as f:

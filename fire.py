@@ -226,13 +226,14 @@ def init(screen):
     """
     Функция задающая значения основным переменным
     """
-    global text0
+    global text0, score
     global all_sprites, fire, background, background_rect, targets
 
     background_creator(screen)
     all_sprites = pygame.sprite.Group()
     targets = pygame.sprite.Group()
     fire = Fire()
+    score = 0
     text0 = font.render("Score: "+str(score), True, WHITE)
     # добавляем огонь к спрайтам
     all_sprites.add(fire)

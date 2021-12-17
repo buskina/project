@@ -12,7 +12,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-
 YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 BLUE = (0, 0, 255)
@@ -28,7 +27,7 @@ class Cell:
     def __init__(self, screen: pygame.Surface):
         """ Конструктор класса Cell
 
-        Parameters
+        Args:
         ----------
         x: type int
             положение ячейки по горизонтали
@@ -41,12 +40,9 @@ class Cell:
         времени)
         time: type int
             время до закрытия ячейки
-        chosen - 
-            в ячейку предлагается поместить новый объект
+        im: type pygame.Surface 
+            изображение ячейки
 
-
-        Returns None.
-        -------
         """
         self.screen = screen
         self.x = 0
@@ -103,6 +99,9 @@ class Empty(Cell):
         self.im = empty
 
     def effect(self, game_manager):
+        """
+        Функця влиияния ячейки на время и счет.
+        """
         game_manager['score'] -= 1
 
 
@@ -125,6 +124,9 @@ class Ordinary(Cell):
         self.im = rd.choice([book1, book2, comp])
 
     def effect(self, game_manager):
+        """
+        Функця влиияния ячейки на время и счет.
+        """
         game_manager['score'] += 3
 
 
@@ -141,6 +143,9 @@ class Zeroer(Cell):
         self.im = heart
 
     def effect(self, game_manager):
+        """
+        Функця влиияния ячейки на время и счет.
+        """
         game_manager['score'] = 0
 
 
@@ -161,6 +166,9 @@ class Timer(Cell):
         self.im = rd.choice([energy, energy2])
 
     def effect(self, game_manager):
+        """
+        Функця влиияния ячейки на время и счет.
+        """
         game_manager['freezing'] += 3
 
 
@@ -177,6 +185,9 @@ class Tricky(Cell):
         self.im = money
 
     def effect(self, game_manager):
+        """
+        Функця влиияния ячейки на время и счет.
+        """
         game_manager['score'] += 5
         game_manager['acceleration'] += 0.5
 
@@ -184,6 +195,14 @@ class Tricky(Cell):
 def fielding(number_of_cells, screen):
     """
     Функция заполняет поле объектами типа Cell
+
+    Parameters
+    ----------
+    number_of_cells: type int
+    screen: type pygame.Surface
+
+    Returns field: type list
+    -------
     """
     field = []
     for i in range(number_of_cells):
@@ -197,6 +216,15 @@ def fielding(number_of_cells, screen):
 def planting(screen, field, number_of_cells):
     """
     Функция меняет параметры каждой клетки
+
+    Parameters
+    ----------
+    screen: type pygame.Surface
+    field: type list
+    number_of_cells: type int
+
+    Returns None.
+    -------
     """
     for i in range(8):
         x = randint(0, CELLNUM - 1)
@@ -214,6 +242,14 @@ def planting(screen, field, number_of_cells):
 def action(field, number_of_cells):
     """
     Функция изменения всего поля за каждую единицу времени
+
+    Parameters
+    ----------
+    field: type list
+    number_of_cells: type int
+
+    Returns None.
+    -------
     """
     for i in range(number_of_cells):
         for j in range(number_of_cells):
@@ -223,6 +259,14 @@ def action(field, number_of_cells):
 def draw(field, number_of_cells):
     """
     Функция отрисовки поля
+
+    Parameters
+    ----------
+    field: type list
+    number_of_cells: type int
+
+    Returns None.
+    -------
     """
     for i in range(number_of_cells):
         for j in range(number_of_cells):
@@ -231,7 +275,18 @@ def draw(field, number_of_cells):
 
 def testing(field, number_of_cells, event, game_manager, screen):
     """
-    Функция проверки попадания в ячейку для каждой ячейки поля
+    Функция проверки попадания в ячейку для каждой ячейки поля, заполнение новой ячейки
+
+    Parameters
+    ----------
+    field: type list
+    number_of_cells: type int
+    event: type event
+    game_manager: type dict
+    screen: type pygame.Surface
+
+    Returns None.
+    -------
     """
 
     x = event.pos[0] // CELLSIZE
@@ -262,14 +317,21 @@ def testing(field, number_of_cells, event, game_manager, screen):
 
 
 def background_creator(screen):
-    # Установка фона
+    """
+    Установка фона
+
+    Returns None.
+    -------
+    """
     background = pygame.image.load(path.join(img_dir, 'back.jpg')).convert()
     background_rect = background.get_rect()
     screen.blit(background, background_rect)
 
 
 def game_2(screen, clock):
-
+    """
+    Функция основного цикла игры. Возвращает очки игрока.
+    """
     game_manager = {
         'score': 0,
         'time left': 30,

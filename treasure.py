@@ -23,10 +23,7 @@ snd_dir = path.join(path.dirname(__file__), 'snd')
 
 def pos_generation():
     """
-    Генерация положения сокровища и вычисление количества градиентных кругов
-
-    Returns None.
-    -------
+    Функция генерации положения сокровища. Возвращает количество градиентных кругов для покытия.
     """
     global x, y
     x = randint(0, WIDTH-20)
@@ -39,14 +36,7 @@ def pos_generation():
 
 def layer_creator(n):
     """
-    Сборка массива цветов градиента
-
-    Parameters
-    ----------
-    n: type int
-
-    Returns None.
-    -------
+    Сборка массива цветов градиента. Возвращает готовую поверхность с сокровищем и раскраской
     """
     colors = []
     for i in range(n):
@@ -143,6 +133,7 @@ def processing(event, layer, screen):
     if event.type == pygame.QUIT:
         scorevalue = "finished"
     elif event.type == pygame.MOUSEMOTION:
+        # Отрисовка лупы с кусочком поверхности сокровища
         x1, y1 = pygame.mouse.get_pos()
         pygame.draw.line(screen, BLACK, (x1-20, y1+20), (x1-10, y1+10), 5)
         pygame.draw.circle(screen, BLACK, (x1, y1), 14, 5)
@@ -157,29 +148,9 @@ def processing(event, layer, screen):
             scorevalue = "Oops! You've lost"
 
 
-def finishing(scorevalue, screen):
-    """
-    Окончание игры
-
-    Parameters
-    ----------
-    scorevalue: type str
-    screen: type pygame.Surface
-
-    Returns None.
-    -------
-    """
-    screen.fill(BLACK)
-    font = pygame.font.Font(None, 72)
-    scoreboard = font.render(scorevalue, True, GREEN)
-    screen.blit(scoreboard, (250, 250))
-    pygame.display.update()
-    pygame.time.delay(500)
-
-
 def init():
     """
-    Определяет значение констант
+    Определяет значение констант. Запускает музыку.
     """
     global counter, secs, scorevalue
     counter = 0
@@ -192,6 +163,9 @@ def init():
 
 
 def game_0(screen, clock):
+    """
+    Функция основного цикла игры. Возвращает True или False в зависимости от успеха игрока.
+    """
 
     init()
     screen.fill(BLACK)
@@ -211,6 +185,7 @@ def game_0(screen, clock):
         return True
     else:
         return False
+
 
 if __name__ == '__main__':
     pygame.init()
