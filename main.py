@@ -365,7 +365,10 @@ finished = False
 try:
     with open('table.txt', 'r') as f:
         data = json.load(f)
-        access = data[name]
+        if name in data:
+            access = data[name]
+        else:
+            access = [0, 0, 0, 0, 0]
 except:
     with open("table.txt", "w") as f:
         data = {}
